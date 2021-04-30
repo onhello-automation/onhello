@@ -1,0 +1,26 @@
+{
+	"name": "onhello",
+	"version": "0.1.0",
+	"description": "Reply to messages in Teams.",
+	"license": "BSD-3-Clause",
+	"scripts": {
+		"dev": "webextension-toolbox dev",
+		"build": "webextension-toolbox build"
+	},
+	"devDependencies": {
+		"ts-loader": "^8.0.13",
+		"typescript": "^4.2.4",
+		"webextension-polyfill-ts": "^0.25.0",
+		"webextension-toolbox": "latest"
+	},
+	"dependencies": {
+		"@material-ui/core": "^4.11.3",
+		"@material-ui/icons": "^4.11.2",
+		"@types/jquery": "^3.5.5",
+		"@types/react": "^17.0.0",
+		"@types/react-dom": "^17.0.0",
+		"jquery": "^3.6.0",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2"
+	}
+}

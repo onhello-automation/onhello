@@ -1,0 +1,39 @@
+{
+	"appName": {
+		"message": "onhello",
+		"description": "The name of the application."
+	},
+	"appShortName": {
+		"message": "onhello",
+		"description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name"
+	},
+	"appDescription": {
+		"message": "Automatically reply to messages in Teams.",
+		"description": "The description of the application"
+	},
+	"browserActionTitle": {
+		"message": "onhello",
+		"description": "The title of the browser action button"
+	},
+	"optionsPageTitle": {
+		"message": "⚙️ Options"
+	},
+	"themeSectionTitle": {
+		"message": "🎨 Theme"
+	},
+	"themePreferenceDescription": {
+		"message": "Changing the theme will not effect this page until you reload the page."
+	},
+	"rulesSectionTitle": {
+		"message": "🤖 Rules"
+	},
+	"rulesInstructions": {
+		"message": "Set up some rules for how to respond to messages. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. You can use HTML and some placeholders. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
+	},
+	"saveInstructions": {
+		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
+	},
+	"advancedSectionTitle": {
+		"message": "🤓 Advanced"
+	}
+}
