@@ -1,10 +1,10 @@
-import { assert } from 'chai'
+import { expect } from 'chai'
 import { replaceResponseText } from '../handle_response'
 
 describe('handle_response', () => {
-	it('replaceResponseText', () => {
-		assert.equal(replaceResponseText("Hey", "John Smith"), "Hey")
-		assert.equal(replaceResponseText("Hey {{ FROM }}", "John Smith"), "Hey John Smith")
-		assert.equal(replaceResponseText("Hey {{ FROM_FIRST_NAME }}", "John Smith"), "Hey John")
-	})
+    it('replaceResponseText', () => {
+        expect(replaceResponseText("Hey", "John Smith")).to.equal("Hey")
+        expect(replaceResponseText("Hey {{ FROM }}", "John Smith")).to.equal("Hey John Smith")
+        expect(replaceResponseText("Hey {{ FROM_FIRST_NAME }}", "John Smith")).to.equal("Hey John")
+    })
 })
