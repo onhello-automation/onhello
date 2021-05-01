@@ -18,3 +18,9 @@ export interface RulesSettings {
 	dateModified: Date
 	apps: Rules[]
 }
+
+export function checkRules(rules: RulesSettings): void {
+	if (typeof rules !== 'object') {
+		throw new Error("rules must be an object.")
+	}
+}

@@ -12,6 +12,7 @@ import React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
+import { checkRules } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
 
 const styles = (theme: Theme) => createStyles({
@@ -80,7 +81,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		const value = event.target.value
 		try {
 			const parsed = JSON.parse(value)
-			// TODO Validate more.
+			checkRules(parsed)
 		} catch (err) {
 			this.setState({ errorInRules: true })
 		}
@@ -111,7 +112,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		let rules
 		try {
 			rules = JSON.parse(this.state.rulesJson)
-			// TODO Validate more.
+			checkRules(rules)
 		} catch (err) {
 			alert(`Error parsing rules: ${err}.`)
 			return

@@ -40,7 +40,7 @@ export class AppTheme extends React.Component<Props, {
 	}
 
 	render(): React.ReactNode {
-		let { themePreference } = this.state
+		const { themePreference } = this.state
 
 		const themeOptions = {
 			palette: {

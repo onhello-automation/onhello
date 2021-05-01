@@ -19,9 +19,10 @@ export class ErrorHandler {
 		const { serviceError, clearAfterMs } = input
 		let { errorMsg } = input
 		if (typeof errorMsg === 'string' && errorMsg) {
+			// Use errorMsg.
 		} else if (typeof serviceError === 'string' && !errorMsg) {
 			errorMsg = serviceError
-		} else if (serviceError !== undefined && serviceError.responseJSON && serviceError!.responseJSON.error) {
+		} else if (serviceError !== undefined && serviceError.responseJSON && serviceError.responseJSON.error) {
 			const { errorCode, message } = serviceError.responseJSON.error
 			errorMsg = browser.i18n.getMessage(`errorCode_${errorCode}`) || message
 		} else if (typeof input !== 'string') {
@@ -34,7 +35,7 @@ export class ErrorHandler {
 			clearTimeout(this.lastTimeout)
 			this.errorTextElement.innerText = errorMsg
 			this.lastTimeout = setTimeout(() => {
-				if (this.errorTextElement!.innerText === errorMsg) {
+				if (this.errorTextElement && this.errorTextElement.innerText === errorMsg) {
 					this.clear()
 				}
 			}, clearAfterMs || (10 * 1000))

@@ -1,6 +1,6 @@
-import { Rule, Rules, RulesSettings } from './rules/rules'
+import { Rule, Rules } from './rules/rules'
 
-export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules) {
+export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void> {
 	// Handle Teams response.
 	// Eventually the rules will have JSON paths to know how to handle messages for different sites.
 	if (responseBody && Array.isArray(responseBody.eventMessages) && responseBody.eventMessages.length > 0) {
@@ -38,7 +38,7 @@ export async function handleResponse(url: string, responseBody: any, requestHead
 					}
 				}
 				if (messageText) {
-					console.debug(`onhello: Got \"${messageText}\" from \"${from}\".`)
+					console.debug(`onhello: Got "${messageText}" from "${from}".`)
 					const response = getResponse(from, messageText, settings.rules)
 					if (response) {
 						sendMessage(from, response, toId, requestHeaders, settings)
@@ -99,8 +99,8 @@ export function getResponse(from: string, messageText: string, rules: Rule[]): R
 	return undefined
 }
 
-function sendMessage(imdisplayname: string, response: Response, toId: string, requestHeaders: any, settings: Rules) {
-	console.debug(`onhello/sendMessage: Replying \"${response.text}\" to \"${imdisplayname}\".`)
+function sendMessage(imdisplayname: string, response: Response, toId: string, requestHeaders: any, settings: Rules): Promise<any> {
+	console.debug(`onhello/sendMessage: Replying "${response.text}" to "${imdisplayname}".`)
 	// This was built using by watching request in the Network tab on the browser's DevTools.
 	let url = settings.replyUrl
 	url = url.replace(/{{toId}}/g, toId)

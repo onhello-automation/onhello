@@ -11,6 +11,6 @@ import { browser } from 'webextension-polyfill-ts'
 // 	}
 // })
 
-export function getMessage(key: string) {
+export function getMessage(key: string): string | undefined {
 	return browser.i18n.getMessage(key)
 }

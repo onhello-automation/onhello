@@ -62,7 +62,7 @@ class App extends React.Component<WithStyles<typeof styles>, {
 						<a className={`${classes.pageButton} ${this.state.page === 'options' ? classes.selectedPageButton : ''}`}
 							onClick={() => this.showOptions('options')}>
 							⚙️
-					</a>
+						</a>
 					</div>
 				</Container>
 				{this.page()}

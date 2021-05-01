@@ -98,11 +98,6 @@ class Reactions extends React.Component<WithStyles<typeof styles>, {
 
 	constructor(props: any) {
 		super(props)
-
-		this.state = {}
-	}
-
-	componentDidMount() {
 	}
 
 	openOptions(): void {
