@@ -1,4 +1,4 @@
-import { handleResponse } from './handle_response_body'
+import { handleResponse } from './handle_response'
 
 
 // This file is JavaScript because it was tricky to override XMLHttpRequest in TypeScript.
