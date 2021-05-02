@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Change to ubuntu-20.04 when it is fully supported.
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: yarn install
+
+      - name: Test
+        run: yarn test
+
+      - name: Lint
+        # Split Lint into a separate task so that it can always run even if the tests fail.
+        run: yarn lint
+        if: success() || failure()
+
+      - name: Build
+        run: yarn build chrome
