@@ -19,15 +19,13 @@ This was built using [webextension-toolbox](https://github.com/HaNdTriX/webexten
 Run one of:
 
     yarn dev chrome
-    yarn dev firefox
-    yarn dev opera
+
+Other options might build but as of May 2021, Teams isn't supported in other browsers.
 
 ## Build
 Run one of:
 
     yarn build chrome
-    yarn build firefox
-    yarn build opera
 
 ## Installing in the browser
 Load the `dist/<browser>` folder as an unpacked extension in your browser.
