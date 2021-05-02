@@ -51,7 +51,6 @@ XHR.send = function () {
 							responseBody = this.response
 						}
 						// console.debug("onhello: responseBody:", this.responseURL, responseBody)
-
 						handleResponse(url, responseBody, this._requestHeaders, settings)
 					}
 				}

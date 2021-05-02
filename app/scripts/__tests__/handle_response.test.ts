@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { replaceResponseText } from '../handle_response'
+import { replaceResponseText } from '../response'
 
 describe('handle_response', () => {
 	it('replaceResponseText', () => {

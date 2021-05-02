@@ -171,6 +171,14 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					</Button>
 				</div>
 			</div>
+			<div className={classes.section}>
+				<Typography component="h5" variant="h5">
+					{getMessage('advancedSectionTitle') || "Advanced"}
+				</Typography>
+				<Typography component="p">
+					{getMessage('advancedInfo')}
+				</Typography>
+			</div>
 		</Container >
 	}
 }
