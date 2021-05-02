@@ -1,7 +1,7 @@
 import { expect } from 'chai'
-import { replaceResponseText } from '../handle_response'
+import { replaceResponseText } from '../response'
 
-describe('handle_response', () => {
+describe('response', () => {
 	it('replaceResponseText', () => {
 		expect(replaceResponseText("Hey", "John Smith")).to.equal("Hey")
 		expect(replaceResponseText("Hey {{ FROM }}", "John Smith")).to.equal("Hey John Smith")

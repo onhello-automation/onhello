@@ -35,5 +35,8 @@
 	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"
+	},
+	"advancedInfo": {
+		"message": "Looking for more customization? You can define some methods in your browser's Console or any other clever way you can think of: `window._onhelloGetResponse(from: string, messageText: string, rules: Rule[]): {text: string, messageType: 'Text' | 'RichText/Html'}` to build a response to a message or `window._onhelloHandleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void>` to directly handle a response to a web request. You will still need a list of \"apps\" defined in your rules."
 	}
 }

@@ -10,7 +10,7 @@
 	"scripts": {
 		"dev": "webextension-toolbox dev",
 		"build": "webextension-toolbox build",
-		"test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ts-mocha --require dotenv/config --recursive --exit --extension ts app/**/__tests__/*.test.ts",
+		"test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ts-mocha --require dotenv/config --recursive --exit --extension ts app/**/*.test.ts",
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"lint-fix": "eslint  . --fix --ext .js,.jsx,.ts,.tsx"
 	},

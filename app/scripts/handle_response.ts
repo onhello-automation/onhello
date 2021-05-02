@@ -1,6 +1,18 @@
-import { Rule, Rules } from './rules/rules'
+import { getResponse, Response } from './response'
+import { APP_DEFAULTS, Rule, Rules } from './rules/rules'
+
+declare global {
+	interface Window {
+		_onhelloGetResponse: (from: string, messageText: string, rules: Rule[]) => Response
+		_onhelloHandleResponse: (url: string, responseBody: any, requestHeaders: any, settings: Rules) => Promise<void>
+	}
+}
 
 export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void> {
+	if (window._onhelloHandleResponse) {
+		window._onhelloHandleResponse(url, responseBody, requestHeaders, settings)
+		return
+	}
 	// Handle Teams response.
 	// Eventually the rules will have JSON paths to know how to handle messages for different sites.
 	if (responseBody && Array.isArray(responseBody.eventMessages) && responseBody.eventMessages.length > 0) {
@@ -39,7 +51,12 @@ export async function handleResponse(url: string, responseBody: any, requestHead
 				}
 				if (messageText) {
 					console.debug(`onhello: Got "${messageText}" from "${from}".`)
-					const response = getResponse(from, messageText, settings.rules)
+					let response
+					if (window._onhelloGetResponse) {
+						response = window._onhelloGetResponse(from, messageText, settings.rules)
+					} else {
+						response = getResponse(from, messageText, settings.rules)
+					}
 					if (response) {
 						sendMessage(from, response, toId, requestHeaders, settings)
 					}
@@ -68,43 +85,13 @@ export function isFromCurrentUser(from: string, url: string): boolean {
 	return false
 }
 
-export class Response {
-	constructor(
-		public text: string,
-		public messageType: 'Text' | 'RichText/Html' = 'Text') { }
-}
-
-export function replaceResponseText(text: string, from: string): string {
-	const firstName = (from || "").split(/\s+/)[0]
-	let result = text.replace(/{{\s*FROM_FIRST_NAME\s*}}/g, firstName)
-	result = result.replace(/{{\s*FROM\s*}}/g, from)
-	return result
-}
-
-export function getResponse(from: string, messageText: string, rules: Rule[]): Response | undefined {
-	for (const rule of rules) {
-		// console.debug("onhello: Checking rule:", rule)
-		if (rule.messageExactMatch === messageText
-			|| (rule.messagePattern !== undefined
-				&& new RegExp(rule.messagePattern, rule.regexFlags).test(messageText))) {
-			if (!Array.isArray(rule.responses) || rule.responses.length === 0) {
-				console.warn("onhello: There are no responses set for rule:", rule)
-			}
-			// Pick a random response.
-			let responseText = rule.responses[Math.floor(rule.responses.length * Math.random())]
-			responseText = replaceResponseText(responseText, from)
-			return new Response(responseText, 'RichText/Html')
-		}
-	}
-	return undefined
-}
-
 function sendMessage(imdisplayname: string, response: Response, toId: string, requestHeaders: any, settings: Rules): Promise<any> {
 	console.debug(`onhello/sendMessage: Replying "${response.text}" to "${imdisplayname}".`)
-	// This was built using by watching request in the Network tab on the browser's DevTools.
-	let url = settings.replyUrl
+	// Shouldn't need the defaults here because the value should already get applied.
+	let url = settings.replyUrl || APP_DEFAULTS[settings.name].replyUrl
 	url = url.replace(/{{toId}}/g, toId)
 
+	// This was built using by watching request in the Network tab on the browser's DevTools.
 	const body = {
 		content: response.text,
 		messagetype: response.messageType,

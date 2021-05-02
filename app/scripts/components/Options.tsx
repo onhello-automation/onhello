@@ -63,7 +63,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			let { rules } = userSettings
 			rules = JSON.stringify(rules, null, 4)
 			this.setState({
-				themePreference,
+				themePreference: themePreference || 'device',
 				rulesJson: rules,
 			})
 		})
@@ -170,6 +170,14 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						Save Rules
 					</Button>
 				</div>
+			</div>
+			<div className={classes.section}>
+				<Typography component="h5" variant="h5">
+					{getMessage('advancedSectionTitle') || "Advanced"}
+				</Typography>
+				<Typography component="p">
+					{getMessage('advancedInfo')}
+				</Typography>
 			</div>
 		</Container >
 	}

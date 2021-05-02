@@ -1,9 +1,10 @@
 import { browser } from 'webextension-polyfill-ts'
-import { getRules } from './rules/get_rules'
+import { applyDefaults, getRules } from './rules/get_rules'
 
 getRules().then(rules => {
 	// I tried so many ways to get the rules into the page, this seems like one of the only ways because
 	// you can't access storage directly in the injected script.
+	applyDefaults(rules)
 	const rulesScript = document.createElement('script')
 	// Add extra escaping to help with escaping quotes and backslashes properly.
 	const rulesString = JSON.stringify(JSON.stringify(rules))
