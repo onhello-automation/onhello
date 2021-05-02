@@ -29,7 +29,7 @@ export async function setupUserSettings(requiredKeys: (keyof (UserSettings))[]):
 	if (requiredKeys.indexOf('rules') > -1) {
 		// browser.storage.local.remove('rules')
 		// browser.storage.sync.remove('rules')
-		result.rules = getRules()
+		result.rules = await getRules()
 	}
 
 	return result

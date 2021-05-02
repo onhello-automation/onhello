@@ -41,6 +41,35 @@ export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 	}
 }
 
+/**
+ * The rules that will be used if the user never set any up.
+ */
+export const DEFAULT_RULES: RulesSettings = {
+	dateModified: new Date(),
+	apps: [
+		{
+			name: 'teams',
+			// Don't put the values from APP_DEFAULTS because we might want to change them for everyone in an update
+			// and that can't be done if the user saves explicit values for them.
+			rules: [
+				{
+					messageExactMatch: "Hi",
+					responses: ["Hey, what's up?", "Hi, how are you?"]
+				},
+				{
+					messageExactMatch: "Good morning",
+					responses: ["Good morning {{ FROM }}, what's up?"]
+				},
+				{
+					messagePattern: '^(hello|hey|hi|good (morning|evening|afternoon))\\b.{0,12}$',
+					regexFlags: 'i',
+					responses: ["🤖 <em>This is an automated response:</em> Hey {{ FROM_FIRST_NAME }}, what's up?"]
+				},
+			]
+		},
+	]
+}
+
 export function checkRules(rules: RulesSettings): void {
 	if (typeof rules !== 'object') {
 		throw new Error("rules must be an object.")
