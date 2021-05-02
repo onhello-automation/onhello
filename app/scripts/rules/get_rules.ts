@@ -1,16 +1,24 @@
 import { browser } from 'webextension-polyfill-ts'
-import { RulesSettings } from './rules'
+import { AppDefaults, RulesSettings } from './rules'
 
+export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
+	teams: {
+		urlPattern: '/poll$',
+		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
+		// TODO Add JSON paths of where to get the message, sender name, etc.
+	}
+}
+
+/**
+ * The rules that will be used if the user never set any up.
+ */
 export const DEFAULT_RULES: RulesSettings = {
 	dateModified: new Date(),
 	apps: [
 		{
-			comments: "For Microsoft Teams",
-			urlPattern: '/poll$',
-			replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
-			// TODO Add JSON paths of where to get the message, sender name, etc.
-			// TODO Add time range of when to respond.
-			// TODO Add message age limit.
+			name: 'teams',
+			// Don't put the values from APP_DEFAULTS because we might want to change them for everyone in an update
+			// and that can't be done if the user saves explicit values for them.
 			rules: [
 				{
 					messageExactMatch: "Hi",
@@ -30,15 +38,35 @@ export const DEFAULT_RULES: RulesSettings = {
 	]
 }
 
-export async function getRules(): Promise<RulesSettings | undefined> {
-	let { rules } = await browser.storage.local.get('rules')
-	if (rules === undefined) {
-		const results = await browser.storage.sync.get('rules')
-		if (results === undefined || results.rules === undefined) {
-			console.debug("onhello: no rules found. Using default rules.")
-			return DEFAULT_RULES
-		}
-		rules = results.rules
+export async function getRules(): Promise<RulesSettings> {
+	const [localRules, syncedRules] = await Promise.all([
+		browser.storage.local.get('rules'),
+		browser.storage.sync.get('rules'),
+	])
+	let result: RulesSettings
+	if (localRules.rules === undefined || syncedRules.rules === undefined) {
+		result = DEFAULT_RULES
+	} else if (localRules.rules.dateModified === undefined) {
+		result = syncedRules.rules
+	} else if (syncedRules.rules.dateModified === undefined) {
+		result = localRules.rules
+	} else if (new Date(syncedRules.rules.dateModified) > new Date(localRules.rules.dateModified)) {
+		result = syncedRules.rules
+	} else {
+		result = localRules.rules
 	}
-	return rules
+
+	return result
+}
+
+export function applyDefaults(rules: RulesSettings): void {
+	for (const app of rules.apps) {
+		const defaults = APP_DEFAULTS[app.name]
+		if (!app.replyUrl) {
+			app.replyUrl = defaults.replyUrl
+		}
+		if (!app.urlPattern) {
+			app.urlPattern = defaults.urlPattern
+		}
+	}
 }
