@@ -33,6 +33,14 @@ export interface Rule {
 	responses: string[]
 }
 
+export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
+	teams: {
+		urlPattern: '/poll$',
+		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
+		// TODO Add JSON paths of where to get the message, sender name, etc.
+	}
+}
+
 export function checkRules(rules: RulesSettings): void {
 	if (typeof rules !== 'object') {
 		throw new Error("rules must be an object.")

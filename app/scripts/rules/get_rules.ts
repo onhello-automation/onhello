@@ -1,13 +1,5 @@
 import { browser } from 'webextension-polyfill-ts'
-import { AppDefaults, RulesSettings } from './rules'
-
-export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
-	teams: {
-		urlPattern: '/poll$',
-		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
-		// TODO Add JSON paths of where to get the message, sender name, etc.
-	}
-}
+import { APP_DEFAULTS, RulesSettings } from './rules'
 
 /**
  * The rules that will be used if the user never set any up.

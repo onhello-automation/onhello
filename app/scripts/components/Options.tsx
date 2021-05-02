@@ -63,7 +63,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			let { rules } = userSettings
 			rules = JSON.stringify(rules, null, 4)
 			this.setState({
-				themePreference,
+				themePreference: themePreference || 'device',
 				rulesJson: rules,
 			})
 		})

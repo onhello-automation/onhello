@@ -29,7 +29,7 @@ export class AppTheme extends React.Component<Props, {
 
 	async componentDidMount(): Promise<void> {
 		let { themePreference } = await setupUserSettings(['themePreference'])
-		if (themePreference === 'device') {
+		if (themePreference === undefined || themePreference === 'device') {
 			themePreference = isDarkModePreferred() ? 'dark' : 'light'
 		}
 		if (themePreference !== this.state.themePreference) {

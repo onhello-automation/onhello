@@ -1,6 +1,5 @@
 import { getResponse, Response } from './response'
-import { APP_DEFAULTS } from './rules/get_rules'
-import { Rule, Rules } from './rules/rules'
+import { APP_DEFAULTS, Rule, Rules } from './rules/rules'
 
 declare global {
 	interface Window {
