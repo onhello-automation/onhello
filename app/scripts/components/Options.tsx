@@ -1,18 +1,19 @@
-import { PaletteType } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import { PaletteType } from '@material-ui/core'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles'
 import TextareaAutosize from '@material-ui/core/TextareaAutosize'
+import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
-import { checkRules } from '../rules/rules'
+import { APP_DEFAULTS, checkRules, DEFAULT_RULES, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
 
 const styles = (theme: Theme) => createStyles({
@@ -31,6 +32,9 @@ const styles = (theme: Theme) => createStyles({
 	instructions: {
 		marginBottom: '1em',
 	},
+	rulesUi: {
+		marginBottom: '1em',
+	},
 	rulesInput: {
 		width: '80%'
 	},
@@ -46,7 +50,7 @@ const styles = (theme: Theme) => createStyles({
 class Options extends React.Component<WithStyles<typeof styles>, {
 	themePreference: ThemePreferenceType | ''
 	rulesJson: string
-	errorInRules: boolean | string
+	errorInRules: string | undefined
 }> {
 	private errorHandler = new ErrorHandler(undefined)
 
@@ -55,7 +59,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.state = {
 			themePreference: '',
 			rulesJson: '',
-			errorInRules: false,
+			errorInRules: undefined,
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -86,12 +90,13 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 
 	handleRulesChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
 		const value = event.target.value
-		let errorInRules = false
+		let errorInRules = undefined
 		try {
 			const parsed = JSON.parse(value)
 			checkRules(parsed)
 		} catch (err) {
-			errorInRules = true
+			errorInRules = err.toString()
+			console.debug("errorInRules:", typeof errorInRules)
 		}
 		this.setState<never>({
 			[event.target.name]: value,
@@ -134,8 +139,88 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	}
 
 	renderRulesUi(): React.ReactNode {
-		return <div>
+		const { classes } = this.props
 
+		if (this.state.errorInRules) {
+			return <div></div>
+		}
+
+		// Extra check just in case.
+		let rules: RulesSettings
+		try {
+			rules = JSON.parse(this.state.rulesJson)
+			checkRules(rules)
+		} catch (err) {
+			return <div></div>
+		}
+
+		return <div className={classes.rulesUi}>
+			{rules.apps.map((settings, appIndex) => {
+				const defaults = APP_DEFAULTS[settings.name]
+				return <div key={`rules-${settings.name}-${appIndex}`}>
+					<TextField name='onhelloAppName'
+						variant="outlined"
+						label={"App name (only \"teams\" is supported for now)"}
+						placeholder={"teams"}
+						value={settings.name}
+						// onChange={this.handleChange}
+						style={{ display: 'block' }}
+						inputProps={{}}
+					/>
+					<TextField name='onhelloUrlPattern'
+						variant="outlined"
+						label={"URL pattern of requests to get messages"}
+						value={settings.urlPattern}
+						placeholder={defaults ? defaults.urlPattern : undefined}
+						// onChange={this.handleChange}
+						style={{ display: 'block' }}
+					/>
+					<TextField name='onhelloReplyUrl'
+						variant="outlined"
+						label={"Reply URL"}
+						value={settings.replyUrl}
+						placeholder={defaults ? defaults.replyUrl : undefined}
+						// onChange={this.handleChange}
+						style={{ display: 'block' }}
+					/>
+					{settings.rules.map((rule, ruleIndex) => {
+						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}>
+							<Typography component="h6" variant="h6">
+								{`${settings.name} Rule ${ruleIndex + 1}`}
+							</Typography>
+							<TextField label={"Exact Match"}
+								variant="outlined"
+								value={rule.messageExactMatch}
+								// onChange={this.handleChange}
+								style={{ display: 'block' }}
+							/>
+							<div style={{ display: 'block' }}>
+								<TextField label={"Pattern (Regular Expression)"}
+									variant="outlined"
+									value={rule.messagePattern}
+								// onChange={this.handleChange}
+								// style={{ display: 'block' }}
+								/>
+								<TextField label={"Pattern flags"}
+									variant="outlined"
+									value={rule.regexFlags}
+								// onChange={this.handleChange}
+								// style={{ display: 'block' }}
+								/>
+							</div>
+							{rule.responses.map((response, responseIndex) => {
+								return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
+									label={"Response"}
+									variant="outlined"
+									value={response}
+									// onChange={this.handleChange}
+									style={{ display: 'block' }}
+								/>
+							})}
+						</div>
+					})}
+				</div>
+			})}
 		</div>
 	}
 
@@ -175,9 +260,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				{/* Rules UI */}
 				{this.renderRulesUi()}
 				{/* Raw Rules */}
-				<Typography component="p">
+				<Typography component="p" className={classes.instructions}>
 					{getMessage('rulesRawInstructions')}
 				</Typography>
+				{this.state.errorInRules && <Typography component="p" className={`${classes.instructions} ${classes.rulesInputError}`}>
+					{this.state.errorInRules}
+				</Typography>}
 				<TextareaAutosize name="rulesJson"
 					className={`${classes.instructions} ${classes.rulesInput} ${this.state.errorInRules ? classes.rulesInputError : ''}`}
 					aria-label="Enter your rules"
