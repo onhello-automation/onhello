@@ -15,6 +15,7 @@ import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
 import { APP_DEFAULTS, checkRules, DEFAULT_RULES, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
+import { isDarkModePreferred } from './AppTheme'
 
 const styles = (theme: Theme) => createStyles({
 	title: {
@@ -78,7 +79,6 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				rulesJson: rules,
 			})
 		})
-
 	}
 
 	handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -154,66 +154,103 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			return <div></div>
 		}
 
+		let inputBackground: string | undefined = undefined, inputColor: string | undefined = undefined
+		const { themePreference } = this.state
+		if (themePreference === 'dark' || (themePreference === 'device' && isDarkModePreferred())) {
+			inputBackground = '#303030'
+			inputColor = '#eee'
+		}
+
 		return <div className={classes.rulesUi}>
 			{rules.apps.map((settings, appIndex) => {
 				const defaults = APP_DEFAULTS[settings.name]
 				return <div key={`rules-${settings.name}-${appIndex}`}>
-					<TextField name='onhelloAppName'
+					{/* Labels on TextFields don't work well when rendered dynamically */}
+					{/* TODO Move labels to messages.json */}
+					<Typography component="p">
+						{"App name (only \"teams\" is supported for now)"}
+					</Typography>
+					<TextField name='onhelloAppName' required
+						key={`appName-${appIndex}`}
 						variant="outlined"
-						label={"App name (only \"teams\" is supported for now)"}
+						type="text"
 						placeholder={"teams"}
 						value={settings.name}
 						// onChange={this.handleChange}
-						style={{ display: 'block' }}
-						inputProps={{}}
+						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+						style={{ display: 'block', color: inputColor, backgroundColor: inputBackground, }}
 					/>
+					<Typography component="p">
+						{"URL pattern of requests to get messages. Leave the default value if you're not sure what to put."}
+					</Typography>
 					<TextField name='onhelloUrlPattern'
+						key={`urlPattern-${appIndex}`}
 						variant="outlined"
-						label={"URL pattern of requests to get messages"}
 						value={settings.urlPattern}
 						placeholder={defaults ? defaults.urlPattern : undefined}
 						// onChange={this.handleChange}
-						style={{ display: 'block' }}
+						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+						style={{ display: 'block', }}
 					/>
+					<Typography component="p">
+						{"Reply URL. Leave the default value if you're not sure what to put."}
+					</Typography>
 					<TextField name='onhelloReplyUrl'
 						variant="outlined"
-						label={"Reply URL"}
 						value={settings.replyUrl}
 						placeholder={defaults ? defaults.replyUrl : undefined}
 						// onChange={this.handleChange}
-						style={{ display: 'block' }}
+						inputProps={{
+							style: { color: inputColor, backgroundColor: inputBackground, },
+						}}
+						// InputProps={{ width: 400 }}
+						style={{ display: 'block', }}
 					/>
 					{settings.rules.map((rule, ruleIndex) => {
 						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}>
+							{/* TODO Add "Delete" button. */}
 							<Typography component="h6" variant="h6">
 								{`${settings.name} Rule ${ruleIndex + 1}`}
 							</Typography>
-							<TextField label={"Exact Match"}
+							<Typography component="p">
+								{"Exact Match"}
+							</Typography>
+							<TextField
 								variant="outlined"
 								value={rule.messageExactMatch}
 								// onChange={this.handleChange}
+								inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
 								style={{ display: 'block' }}
 							/>
 							<div style={{ display: 'block' }}>
-								<TextField label={"Pattern (Regular Expression)"}
+								<Typography component="p">
+									{"Pattern (optional) (You can use a Regular Expression - enter flags in the next box such as \"i\" (with no quotes) for ignore case)"}
+								</Typography>
+								<TextField
 									variant="outlined"
 									value={rule.messagePattern}
-								// onChange={this.handleChange}
-								// style={{ display: 'block' }}
+									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+									// onChange={this.handleChange}
+									style={{ marginRight: '1em' }}
 								/>
-								<TextField label={"Pattern flags"}
+								<TextField
 									variant="outlined"
 									value={rule.regexFlags}
+									placeholder="i"
+									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
 								// onChange={this.handleChange}
 								// style={{ display: 'block' }}
 								/>
 							</div>
+							<Typography component="p">
+								{"Responses. One will be randomly selected."}
+							</Typography>
 							{rule.responses.map((response, responseIndex) => {
 								return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
-									label={"Response"}
 									variant="outlined"
 									value={response}
 									// onChange={this.handleChange}
+									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
 									style={{ display: 'block' }}
 								/>
 							})}
@@ -221,6 +258,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					})}
 				</div>
 			})}
+			{/* TODO Add "Add" button. */}
 		</div>
 	}
 

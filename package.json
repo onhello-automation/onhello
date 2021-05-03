@@ -30,7 +30,7 @@
 		"webextension-toolbox": "latest"
 	},
 	"dependencies": {
-		"@material-ui/core": "^4.11.3",
+		"@material-ui/core": "^4.11.4",
 		"@material-ui/icons": "^4.11.2",
 		"@types/jquery": "^3.5.5",
 		"@types/react": "^17.0.0",
