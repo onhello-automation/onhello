@@ -28,10 +28,19 @@
 		"message": "🤖 Rules"
 	},
 	"rulesInstructions": {
-		"message": "Set up some rules for how to respond to messages. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. You can use HTML and some placeholders. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
+		"message": "Set up some rules for how to respond to messages. Make sure to click SAVE RULES below when you are done. You can match a message exactly or set up patterns (JavaScript regular expressions) to match more messages."
+	},
+	"rulesResponsesInstructions": {
+		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
+	},
+	"rulesRawInstructions": {
+		"message": "Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
 	},
 	"saveInstructions": {
 		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
+	},
+	"saveRules": {
+		"message": "Save Rules"
 	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"

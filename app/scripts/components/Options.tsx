@@ -28,8 +28,15 @@ const styles = (theme: Theme) => createStyles({
 	themeSelection: {
 		marginLeft: theme.spacing(2),
 	},
+	instructions: {
+		marginBottom: '1em',
+	},
 	rulesInput: {
 		width: '80%'
+	},
+	rulesInputError: {
+		borderColor: 'red',
+		borderWidth: 'medium',
 	},
 	saveRulesButton: {
 		color: 'black',
@@ -79,17 +86,17 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 
 	handleRulesChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
 		const value = event.target.value
+		let errorInRules = false
 		try {
 			const parsed = JSON.parse(value)
 			checkRules(parsed)
 		} catch (err) {
-			this.setState({ errorInRules: true })
+			errorInRules = true
 		}
 		this.setState<never>({
 			[event.target.name]: value,
-			errorInRules: false,
+			errorInRules,
 		})
-
 	}
 
 	handleThemeChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -117,13 +124,19 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			alert(`Error parsing rules: ${err}.`)
 			return
 		}
-		rules.dateModified = new Date()
+		rules.dateModified = new Date().toString()
 		browser.storage.local.set({ rules }).catch(errorMsg => {
 			this.errorHandler.showError({ errorMsg })
 		})
 		browser.storage.sync.set({ rules }).catch(errorMsg => {
 			this.errorHandler.showError({ errorMsg })
 		})
+	}
+
+	renderRulesUi(): React.ReactNode {
+		return <div>
+
+		</div>
 	}
 
 	render(): React.ReactNode {
@@ -150,14 +163,23 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				</FormControl>
 			</div>
 			<div className={classes.section}>
-				<Typography component="h5" variant="h5">
+				<Typography component="h5" variant="h5" className={classes.instructions}>
 					{getMessage('rulesSectionTitle') || "Rules"}
 				</Typography>
-				<Typography component="p">
+				<Typography component="p" className={classes.instructions}>
 					{getMessage('rulesInstructions')}
 				</Typography>
+				<Typography component="p" className={classes.instructions}>
+					{getMessage('rulesResponsesInstructions')}
+				</Typography>
+				{/* Rules UI */}
+				{this.renderRulesUi()}
+				{/* Raw Rules */}
+				<Typography component="p">
+					{getMessage('rulesRawInstructions')}
+				</Typography>
 				<TextareaAutosize name="rulesJson"
-					className={classes.rulesInput}
+					className={`${classes.instructions} ${classes.rulesInput} ${this.state.errorInRules ? classes.rulesInputError : ''}`}
 					aria-label="Enter your rules"
 					onChange={this.handleRulesChange}
 					value={this.state.rulesJson} />
@@ -167,7 +189,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<div>
 					<Button className={classes.saveRulesButton}
 						onClick={this.saveRules}>
-						Save Rules
+						{getMessage('saveRules')}
 					</Button>
 				</div>
 			</div>
@@ -175,7 +197,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('advancedSectionTitle') || "Advanced"}
 				</Typography>
-				<Typography component="p">
+				<Typography component="p" className={classes.instructions}>
 					{getMessage('advancedInfo')}
 				</Typography>
 			</div>
