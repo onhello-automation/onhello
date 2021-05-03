@@ -67,7 +67,7 @@ export const DEFAULT_RULES: RulesSettings = {
 				{
 					messagePattern: '^how did respond so (fast|quickly)\\?',
 					regexFlags: 'i',
-					responses: ["I'm using <a href=\"https://github.com/onhello-automation/onhello\">onhello</a>"]
+					responses: ["I'm using <a href=\"https://github.com/onhello-automation/onhello\">onhello</a>!"]
 				},
 			]
 		},

@@ -33,6 +33,9 @@
 	"rulesResponsesInstructions": {
 		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
 	},
+	"addResponseButton": {
+		"message": "Add Response"
+	},
 	"rulesRawInstructions": {
 		"message": "Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
 	},

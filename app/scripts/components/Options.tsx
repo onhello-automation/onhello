@@ -36,6 +36,9 @@ const styles = (theme: Theme) => createStyles({
 	rulesUi: {
 		marginBottom: '1em',
 	},
+	addResponseButton: {
+		color: 'black',
+	},
 	rulesInput: {
 		width: '80%'
 	},
@@ -63,6 +66,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			errorInRules: undefined,
 		}
 
+		this.setResponse = this.setResponse.bind(this)
 		this.handleChange = this.handleChange.bind(this)
 		this.handleRulesChange = this.handleRulesChange.bind(this)
 		this.handleThemeChange = this.handleThemeChange.bind(this)
@@ -79,6 +83,10 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				rulesJson: rules,
 			})
 		})
+	}
+
+	setRules(rules: RulesSettings): void {
+		this.setState({ rulesJson: JSON.stringify(rules, null, 4) })
 	}
 
 	handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -138,6 +146,21 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		})
 	}
 
+	setResponse(appIndex: number, ruleIndex: number, responseIndex: number, response: string) {
+		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
+		if (rules.apps[appIndex].rules[ruleIndex].responses === undefined) {
+			rules.apps[appIndex].rules[ruleIndex].responses = []
+		}
+		if (responseIndex === rules.apps[appIndex].rules[ruleIndex].responses.length) {
+			rules.apps[appIndex].rules[ruleIndex].responses.push(response)
+		} else if (response === "" && rules.apps[appIndex].rules[ruleIndex].responses.length > 1) {
+			rules.apps[appIndex].rules[ruleIndex].responses.splice(responseIndex, 1)
+		} else {
+			rules.apps[appIndex].rules[ruleIndex].responses[responseIndex] = response
+		}
+		this.setRules(rules)
+	}
+
 	renderRulesUi(): React.ReactNode {
 		const { classes } = this.props
 
@@ -189,7 +212,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						value={settings.urlPattern}
 						placeholder={defaults ? defaults.urlPattern : undefined}
 						// onChange={this.handleChange}
-						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+						inputProps={{
+							style: {
+								color: inputColor, backgroundColor: inputBackground,
+								width: '400px',
+							}
+						}}
 						style={{ display: 'block', }}
 					/>
 					<Typography component="p">
@@ -201,15 +229,18 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						placeholder={defaults ? defaults.replyUrl : undefined}
 						// onChange={this.handleChange}
 						inputProps={{
-							style: { color: inputColor, backgroundColor: inputBackground, },
+							style: {
+								color: inputColor, backgroundColor: inputBackground,
+								// TODO Make responsive and shrink with page.
+								width: '800px',
+							},
 						}}
-						// InputProps={{ width: 400 }}
 						style={{ display: 'block', }}
 					/>
 					{settings.rules.map((rule, ruleIndex) => {
 						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}>
 							{/* TODO Add "Delete" button. */}
-							<Typography component="h6" variant="h6">
+							<Typography component="h6" variant="h6" style={{ marginTop: '0.5em' }}>
 								{`${settings.name} Rule ${ruleIndex + 1}`}
 							</Typography>
 							<Typography component="p">
@@ -219,7 +250,11 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 								variant="outlined"
 								value={rule.messageExactMatch}
 								// onChange={this.handleChange}
-								inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+								inputProps={{
+									style: {
+										color: inputColor, backgroundColor: inputBackground,
+									}
+								}}
 								style={{ display: 'block' }}
 							/>
 							<div style={{ display: 'block' }}>
@@ -229,7 +264,13 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 								<TextField
 									variant="outlined"
 									value={rule.messagePattern}
-									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+									inputProps={{
+										style: {
+											color: inputColor, backgroundColor: inputBackground,
+											// TODO Make responsive and shrink with page.
+											width: '700px',
+										}
+									}}
 									// onChange={this.handleChange}
 									style={{ marginRight: '1em' }}
 								/>
@@ -237,9 +278,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 									variant="outlined"
 									value={rule.regexFlags}
 									placeholder="i"
-									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
+									inputProps={{
+										style: {
+											color: inputColor, backgroundColor: inputBackground,
+										}
+									}}
 								// onChange={this.handleChange}
-								// style={{ display: 'block' }}
 								/>
 							</div>
 							<Typography component="p">
@@ -249,11 +293,21 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 								return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
 									variant="outlined"
 									value={response}
-									// onChange={this.handleChange}
-									inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
-									style={{ display: 'block' }}
+									onChange={(event) => { this.setResponse(appIndex, ruleIndex, responseIndex, event.target.value) }}
+									inputProps={{
+										style: {
+											color: inputColor, backgroundColor: inputBackground,
+											// TODO Make responsive and shrink with page.
+											width: '700px',
+										}
+									}}
+									style={{ display: 'block', marginBottom: '2px', }}
 								/>
 							})}
+							<Button className={classes.addResponseButton}
+								onClick={() => { this.setResponse(appIndex, ruleIndex, rule.responses.length, "") }}>
+								{getMessage('addResponseButton') || "Add Response"}
+							</Button>
 						</div>
 					})}
 				</div>
