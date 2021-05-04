@@ -36,19 +36,22 @@
 	"addResponseButton": {
 		"message": "Add Response"
 	},
-	"rulesRawInstructions": {
-		"message": "Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
-	},
 	"saveInstructions": {
 		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
 	},
 	"saveRules": {
 		"message": "Save Rules"
 	},
+	"rawRulesSectionTitle": {
+		"message": "Raw Rules"
+	},
+	"rulesRawInstructions": {
+		"message": "What a more advanced view of your rules? Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
+	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"
 	},
 	"advancedInfo": {
-		"message": "Looking for more customization? You can define some methods in your browser's Console or any other clever way you can think of: `window._onhelloGetResponse(from: string, messageText: string, rules: Rule[]): {text: string, messageType: 'Text' | 'RichText/Html'}` to build a response to a message or `window._onhelloHandleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void>` to directly handle a response to a web request. You will still need a list of \"apps\" defined in your rules."
+		"message": "Looking for more customization? You can define some methods in your browser's Console or any other clever way you can think of: define `window._onhelloGetResponse(from: string, messageText: string, rules: Rule[]): {text: string, messageType: 'Text' | 'RichText/Html'}` to build a response to a message or define `window._onhelloHandleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void>` to directly handle a response to a web request. You will still need a list of \"apps\" defined in your rules."
 	}
 }

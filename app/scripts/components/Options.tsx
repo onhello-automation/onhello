@@ -163,8 +163,11 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.setRules(rules)
 	}
 
-	updateRules(path: string, value: string) {
+	updateRules(path: string, value: string | undefined) {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
+		if (value === "") {
+			value = undefined
+		}
 		jp.value(rules, path, value)
 		this.setRules(rules)
 	}
@@ -256,8 +259,8 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 							</Typography>
 							<TextField
 								variant="outlined"
-								value={rule.messageExactMatch}
-								// onChange={this.handleChange}
+								value={rule.messageExactMatch || ""}
+								onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messageExactMatch`, event.target.value)}
 								inputProps={{
 									style: {
 										color: inputColor, backgroundColor: inputBackground,
@@ -271,7 +274,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 								</Typography>
 								<TextField
 									variant="outlined"
-									value={rule.messagePattern}
+									value={rule.messagePattern || ""}
 									inputProps={{
 										style: {
 											color: inputColor, backgroundColor: inputBackground,
@@ -279,19 +282,19 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 											width: '700px',
 										}
 									}}
-									// onChange={this.handleChange}
+									onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messagePattern`, event.target.value)}
 									style={{ marginRight: '1em' }}
 								/>
 								<TextField
 									variant="outlined"
-									value={rule.regexFlags}
+									value={rule.regexFlags || ""}
 									placeholder="i"
 									inputProps={{
 										style: {
 											color: inputColor, backgroundColor: inputBackground,
 										}
 									}}
-								// onChange={this.handleChange}
+									onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].regexFlags`, event.target.value)}
 								/>
 							</div>
 							<Typography component="p">
@@ -301,6 +304,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 								return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
 									variant="outlined"
 									value={response}
+									// TODO Allow clicking Enter to add a response.
 									onChange={(event) => { this.setResponse(appIndex, ruleIndex, responseIndex, event.target.value) }}
 									inputProps={{
 										style: {
@@ -348,7 +352,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				</FormControl>
 			</div>
 			<div className={classes.section}>
-				<Typography component="h5" variant="h5" className={classes.instructions}>
+				<Typography component="h5" variant="h5">
 					{getMessage('rulesSectionTitle') || "Rules"}
 				</Typography>
 				<Typography component="p" className={classes.instructions}>
@@ -359,7 +363,21 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				</Typography>
 				{/* Rules UI */}
 				{this.renderRulesUi()}
+				<Typography component="p">
+					{getMessage('saveInstructions')}
+				</Typography>
+				<div>
+					<Button className={classes.saveRulesButton}
+						onClick={this.saveRules}>
+						{getMessage('saveRules')}
+					</Button>
+				</div>
+			</div>
+			<div className={classes.section}>
 				{/* Raw Rules */}
+				<Typography component="h5" variant="h5">
+					{getMessage('rawRulesSectionTitle') || "Raw Rules"}
+				</Typography>
 				<Typography component="p" className={classes.instructions}>
 					{getMessage('rulesRawInstructions')}
 				</Typography>
