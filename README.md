@@ -2,11 +2,9 @@
 
 Automatically reply to messages in Teams (and soon other platforms).
 
-<!--
-# Downloads
+# Download
 You can download the extension for various browsers:
-* [Chrome/Brave/Edge](TODO)
--->
+* [Chrome/Brave/Edge](https://chrome.google.com/webstore/detail/onhello/dljknoapaelicknjmjihiaigbnhcpikm)
 
 # Dev
 This was built using [webextension-toolbox](https://github.com/HaNdTriX/webextension-toolbox).
