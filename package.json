@@ -33,9 +33,11 @@
 		"@material-ui/core": "^4.11.4",
 		"@material-ui/icons": "^4.11.2",
 		"@types/jquery": "^3.5.5",
+		"@types/jsonpath": "^0.2.0",
 		"@types/react": "^17.0.0",
 		"@types/react-dom": "^17.0.0",
 		"jquery": "^3.6.0",
+		"jsonpath": "^1.1.1",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2"
 	}

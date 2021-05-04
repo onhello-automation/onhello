@@ -1,19 +1,20 @@
+import { PaletteType } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-import { PaletteType } from '@material-ui/core'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles'
 import TextareaAutosize from '@material-ui/core/TextareaAutosize'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
+import jp from 'jsonpath'
 import React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
-import { APP_DEFAULTS, checkRules, DEFAULT_RULES, RulesSettings } from '../rules/rules'
+import { APP_DEFAULTS, checkRules, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
 import { isDarkModePreferred } from './AppTheme'
 
@@ -66,11 +67,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			errorInRules: undefined,
 		}
 
-		this.setResponse = this.setResponse.bind(this)
 		this.handleChange = this.handleChange.bind(this)
 		this.handleRulesChange = this.handleRulesChange.bind(this)
 		this.handleThemeChange = this.handleThemeChange.bind(this)
 		this.saveRules = this.saveRules.bind(this)
+		this.setResponse = this.setResponse.bind(this)
+		this.updateRules = this.updateRules.bind(this)
 	}
 
 	async componentDidMount(): Promise<void> {
@@ -161,6 +163,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.setRules(rules)
 	}
 
+	updateRules(path: string, value: string) {
+		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
+		jp.value(rules, path, value)
+		this.setRules(rules)
+	}
+
 	renderRulesUi(): React.ReactNode {
 		const { classes } = this.props
 
@@ -187,7 +195,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		return <div className={classes.rulesUi}>
 			{rules.apps.map((settings, appIndex) => {
 				const defaults = APP_DEFAULTS[settings.name]
-				return <div key={`rules-${settings.name}-${appIndex}`}>
+				return <div key={`rules-${appIndex}`}>
 					{/* Labels on TextFields don't work well when rendered dynamically */}
 					{/* TODO Move labels to messages.json */}
 					<Typography component="p">
@@ -199,7 +207,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						type="text"
 						placeholder={"teams"}
 						value={settings.name}
-						// onChange={this.handleChange}
+						onChange={(event) => this.updateRules(`$.apps[${appIndex}].name`, event.target.value)}
 						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
 						style={{ display: 'block', color: inputColor, backgroundColor: inputBackground, }}
 					/>
@@ -209,9 +217,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					<TextField name='onhelloUrlPattern'
 						key={`urlPattern-${appIndex}`}
 						variant="outlined"
-						value={settings.urlPattern}
+						value={settings.urlPattern || ""}
 						placeholder={defaults ? defaults.urlPattern : undefined}
-						// onChange={this.handleChange}
+						onChange={(event) => this.updateRules(`$.apps[${appIndex}].urlPattern`, event.target.value)}
 						inputProps={{
 							style: {
 								color: inputColor, backgroundColor: inputBackground,
@@ -225,9 +233,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					</Typography>
 					<TextField name='onhelloReplyUrl'
 						variant="outlined"
-						value={settings.replyUrl}
+						value={settings.replyUrl || ""}
 						placeholder={defaults ? defaults.replyUrl : undefined}
-						// onChange={this.handleChange}
+						onChange={(event) => this.updateRules(`$.apps[${appIndex}].replyUrl`, event.target.value)}
 						inputProps={{
 							style: {
 								color: inputColor, backgroundColor: inputBackground,
