@@ -10,13 +10,19 @@ export async function getRules(): Promise<RulesSettings> {
 	if (localRules.rules === undefined || syncedRules.rules === undefined) {
 		result = DEFAULT_RULES
 	} else if (localRules.rules.dateModified === undefined) {
+		console.debug("syncedRules.rules.dateModified:", syncedRules.rules.dateModified)
 		result = syncedRules.rules
 	} else if (syncedRules.rules.dateModified === undefined) {
+		console.debug("localRules.rules.dateModified:", localRules.rules.dateModified)
 		result = localRules.rules
 	} else if (new Date(syncedRules.rules.dateModified) > new Date(localRules.rules.dateModified)) {
 		result = syncedRules.rules
 	} else {
 		result = localRules.rules
+	}
+
+	if (typeof result.dateModified === 'string') {
+		result.dateModified = new Date(result.dateModified)
 	}
 
 	return result

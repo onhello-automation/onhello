@@ -1,7 +1,7 @@
 export type AppName = 'teams'
 
 export interface RulesSettings {
-	dateModified: Date
+	dateModified?: Date
 	apps: Rules[]
 }
 
@@ -35,7 +35,7 @@ export interface Rule {
 
 export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 	teams: {
-		urlPattern: '/poll$',
+		urlPattern: '^https://.*teams.(microsoft|live).com/.*/poll$',
 		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
 		// TODO Add JSON paths of where to get the message, sender name, etc.
 	}
@@ -45,7 +45,6 @@ export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
  * The rules that will be used if the user never set any up.
  */
 export const DEFAULT_RULES: RulesSettings = {
-	dateModified: new Date(),
 	apps: [
 		{
 			name: 'teams',
@@ -64,6 +63,11 @@ export const DEFAULT_RULES: RulesSettings = {
 					messagePattern: '^(hello|hey|hi|good (morning|evening|afternoon))\\b.{0,12}$',
 					regexFlags: 'i',
 					responses: ["🤖 <em>This is an automated response:</em> Hey {{ FROM_FIRST_NAME }}, what's up?"]
+				},
+				{
+					messagePattern: '^how did you respond so (fast|quickly)\\?',
+					regexFlags: 'i',
+					responses: ["I'm using <a href=\"https://github.com/onhello-automation/onhello\">onhello</a>!"]
 				},
 			]
 		},
