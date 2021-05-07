@@ -58,6 +58,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	themePreference: ThemePreferenceType | ''
 	rulesJson: string
 	errorInRules: string | undefined
+	ruleTestText: string
 }> {
 	private errorHandler = new ErrorHandler(undefined)
 
@@ -67,6 +68,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			themePreference: '',
 			rulesJson: '',
 			errorInRules: undefined,
+			ruleTestText: "",
 		}
 
 		this.deleteRule = this.deleteRule.bind(this)
@@ -75,6 +77,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.handleThemeChange = this.handleThemeChange.bind(this)
 		this.saveRules = this.saveRules.bind(this)
 		this.setResponse = this.setResponse.bind(this)
+		this.testRules = this.testRules.bind(this)
 		this.updateRules = this.updateRules.bind(this)
 	}
 
@@ -169,6 +172,13 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
 		rules.apps[appIndex].rules.splice(ruleIndex, 1)
 		this.setRules(rules)
+	}
+
+	testRules(text: string): void {
+		this.setState({
+			ruleTestText: text,
+		})
+		// TODO
 	}
 
 	updateRules(path: string, value: string | undefined | object): void {
@@ -445,6 +455,28 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						{getMessage('saveRules')}
 					</Button>
 				</div>
+			</div>
+			<div className={classes.section}>
+				<Typography component="h5" variant="h5">
+					{getMessage('testRulesSectionTitle') || "Test Your Rules"}
+				</Typography>
+				<Typography component="p" className={classes.instructions}>
+					{getMessage('testRulesInfo')}
+				</Typography>
+				<TextField required
+					variant="outlined"
+					type="text"
+					placeholder={"Hello"}
+					value={this.state.ruleTestText || ""}
+					onChange={(event) => this.testRules(event.target.value)}
+					inputProps={{
+						style: {
+							color: inputColor, backgroundColor: inputBackground,
+							width: '700px',
+						}
+					}}
+					style={{ display: 'block', }}
+				/>
 			</div>
 			<div className={classes.section}>
 				<Typography component="h5" variant="h5">
