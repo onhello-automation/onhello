@@ -69,6 +69,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			errorInRules: undefined,
 		}
 
+		this.deleteRule = this.deleteRule.bind(this)
 		this.handleChange = this.handleChange.bind(this)
 		this.handleRulesChange = this.handleRulesChange.bind(this)
 		this.handleThemeChange = this.handleThemeChange.bind(this)
@@ -108,7 +109,6 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			checkRules(parsed)
 		} catch (err) {
 			errorInRules = err.toString()
-			console.debug("errorInRules:", typeof errorInRules)
 		}
 		this.setState<never>({
 			[event.target.name]: value,
@@ -165,6 +165,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.setRules(rules)
 	}
 
+	deleteRule(appIndex: number, ruleIndex: number): void {
+		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
+		rules.apps[appIndex].rules.splice(ruleIndex, 1)
+		this.setRules(rules)
+	}
+
 	updateRules(path: string, value: string | undefined | object): void {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
 		if (value === "") {
@@ -187,7 +193,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			rules = JSON.parse(this.state.rulesJson)
 			checkRules(rules)
 		} catch (err) {
-			return <div></div>
+			return <div className={classes.rulesInputError}>
+				{`${err}`}
+			</div>
 		}
 
 		let inputBackground: string | undefined = undefined, inputColor: string | undefined = undefined
@@ -258,6 +266,11 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 							<Typography component="h6" variant="h6" style={{ marginTop: '0.5em' }}>
 								{`${settings.name} Rule ${ruleIndex + 1}`}
 							</Typography>
+							<Button className={classes.button}
+								color="secondary"
+								onClick={() => { this.deleteRule(appIndex, ruleIndex) }}>
+								{getMessage('deleteRule') || "Delete Rule"}
+							</Button>
 							<Typography component="p">
 								{"Exact Match"}
 							</Typography>

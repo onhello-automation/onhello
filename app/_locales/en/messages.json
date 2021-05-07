@@ -33,8 +33,11 @@
 	"rulesResponsesInstructions": {
 		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
 	},
+	"deleteRule": {
+		"message": "❌ Delete Rule"
+	},
 	"addResponseButton": {
-		"message": "Add Response"
+		"message": "➕ Add Response"
 	},
 	"saveInstructions": {
 		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
