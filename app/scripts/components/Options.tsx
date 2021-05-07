@@ -16,7 +16,7 @@ import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
 import { APP_DEFAULTS, checkRules, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
-import { isDarkModePreferred } from './AppTheme'
+import { DARK_MODE_INPUT_BACKGROUND_COLOR, DARK_MODE_INPUT_COLOR, isDarkModePreferred } from './AppTheme'
 
 const styles = (theme: Theme) => createStyles({
 	title: {
@@ -191,8 +191,8 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		let inputBackground: string | undefined = undefined, inputColor: string | undefined = undefined
 		const { themePreference } = this.state
 		if (themePreference === 'dark' || (themePreference === 'device' && isDarkModePreferred())) {
-			inputBackground = '#303030'
-			inputColor = '#eee'
+			inputBackground = DARK_MODE_INPUT_BACKGROUND_COLOR
+			inputColor = DARK_MODE_INPUT_COLOR
 		}
 
 		return <div className={classes.rulesUi}>
@@ -212,7 +212,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						value={settings.name}
 						onChange={(event) => this.updateRules(`$.apps[${appIndex}].name`, event.target.value)}
 						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
-						style={{ display: 'block', color: inputColor, backgroundColor: inputBackground, }}
+						style={{ display: 'block', }}
 					/>
 					<Typography component="p">
 						{"URL pattern of requests to get messages. Leave the default value if you're not sure what to put."}
@@ -331,6 +331,13 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	render(): React.ReactNode {
 		const { classes } = this.props
 
+		let inputBackground: string | undefined = undefined, inputColor: string | undefined = undefined
+		const { themePreference } = this.state
+		if (themePreference === 'dark' || (themePreference === 'device' && isDarkModePreferred())) {
+			inputBackground = DARK_MODE_INPUT_BACKGROUND_COLOR
+			inputColor = DARK_MODE_INPUT_COLOR
+		}
+
 		return <Container>
 			<Typography className={classes.title} component="h4" variant="h4">
 				{getMessage('optionsPageTitle') || "⚙️ Options"}
@@ -386,9 +393,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				</Typography>}
 				<TextareaAutosize name="rulesJson"
 					className={`${classes.instructions} ${classes.rulesInput} ${this.state.errorInRules ? classes.rulesInputError : ''}`}
+					spellCheck={false}
 					aria-label="Enter your rules"
 					onChange={this.handleRulesChange}
-					value={this.state.rulesJson} />
+					value={this.state.rulesJson}
+					style={{ backgroundColor: inputBackground, color: inputColor, }}
+				/>
 				<Typography component="p">
 					{getMessage('saveInstructions')}
 				</Typography>
