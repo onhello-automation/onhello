@@ -14,7 +14,7 @@ import React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
-import { APP_DEFAULTS, checkRules, RulesSettings } from '../rules/rules'
+import { APP_DEFAULTS, checkRules, Rule, Rules, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
 import { DARK_MODE_INPUT_BACKGROUND_COLOR, DARK_MODE_INPUT_COLOR, isDarkModePreferred } from './AppTheme'
 
@@ -34,11 +34,16 @@ const styles = (theme: Theme) => createStyles({
 	instructions: {
 		marginBottom: '1em',
 	},
+	button: {
+		color: 'black',
+		marginBottom: '0.25em',
+		marginTop: '0.25em',
+	},
 	rulesUi: {
 		marginBottom: '1em',
 	},
-	addResponseButton: {
-		color: 'black',
+	ruleSection: {
+		marginLeft: '3%',
 	},
 	rulesInput: {
 		width: '80%'
@@ -46,9 +51,6 @@ const styles = (theme: Theme) => createStyles({
 	rulesInputError: {
 		borderColor: 'red',
 		borderWidth: 'medium',
-	},
-	saveRulesButton: {
-		color: 'black',
 	},
 })
 
@@ -148,7 +150,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		})
 	}
 
-	setResponse(appIndex: number, ruleIndex: number, responseIndex: number, response: string) {
+	setResponse(appIndex: number, ruleIndex: number, responseIndex: number, response: string): void {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
 		if (rules.apps[appIndex].rules[ruleIndex].responses === undefined) {
 			rules.apps[appIndex].rules[ruleIndex].responses = []
@@ -163,7 +165,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.setRules(rules)
 	}
 
-	updateRules(path: string, value: string | undefined) {
+	updateRules(path: string, value: string | undefined | object): void {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
 		if (value === "") {
 			value = undefined
@@ -249,7 +251,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						style={{ display: 'block', }}
 					/>
 					{settings.rules.map((rule, ruleIndex) => {
-						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}>
+						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}
+							className={classes.ruleSection}
+						>
 							{/* TODO Add "Delete" button. */}
 							<Typography component="h6" variant="h6" style={{ marginTop: '0.5em' }}>
 								{`${settings.name} Rule ${ruleIndex + 1}`}
@@ -316,16 +320,36 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 									style={{ display: 'block', marginBottom: '2px', }}
 								/>
 							})}
-							<Button className={classes.addResponseButton}
+							<Button className={classes.button}
 								onClick={() => { this.setResponse(appIndex, ruleIndex, rule.responses.length, "") }}>
 								{getMessage('addResponseButton') || "Add Response"}
 							</Button>
 						</div>
 					})}
+					<Button className={`${classes.button} ${classes.ruleSection}`}
+						onClick={() => this.updateRules(`$.apps[${appIndex}].rules[${settings.rules.length}]`, {
+							messageExactMatch: "",
+							responses: [""],
+						} as Rule)}
+					>
+						{getMessage('addRule') || "Add Rule"}
+					</Button>
 				</div>
 			})}
-			{/* TODO Add "Add" button. */}
-		</div>
+			<Button className={classes.button}
+				// Not needed yet.
+				style={{ display: 'none' }}
+				onClick={() => this.updateRules(`$.apps[${rules.apps.length}]`, {
+					name: "teams",
+					rules: [{
+						messageExactMatch: "",
+						responses: [""],
+					}],
+				} as Rules)}
+			>
+				{getMessage('addApp') || "Add App"}
+			</Button>
+		</div >
 	}
 
 	render(): React.ReactNode {
@@ -374,7 +398,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					{getMessage('saveInstructions')}
 				</Typography>
 				<div>
-					<Button className={classes.saveRulesButton}
+					<Button className={classes.button}
 						onClick={this.saveRules}>
 						{getMessage('saveRules')}
 					</Button>
@@ -403,7 +427,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					{getMessage('saveInstructions')}
 				</Typography>
 				<div>
-					<Button className={classes.saveRulesButton}
+					<Button className={classes.button}
 						onClick={this.saveRules}>
 						{getMessage('saveRules')}
 					</Button>
