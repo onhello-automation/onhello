@@ -61,39 +61,14 @@ export class AppTheme extends React.Component<Props, {
 			themeOptions.palette.primary = {
 				main: blue[300],
 			}
-			if (!themeOptions.overrides) {
-				themeOptions.overrides = {}
-			}
 
-			// Trying to set the default background and text color.
-			// This doesn't seem to help.
 			const backgroundColor = '#303030'
 			const color = '#eee'
-			themeOptions.overrides.MuiInput = {
-				input: {
-					backgroundColor, color,
-				}
-			}
-			themeOptions.overrides.MuiFilledInput = {
-				input: {
-					backgroundColor, color,
-				}
-			}
-			themeOptions.overrides.MuiInputBase = {
-				input: {
-					backgroundColor, color,
-				}
-			}
-
-			themeOptions.overrides.MuiOutlinedInput = {
-				input: {
-					backgroundColor, color,
-				}
-			}
-			themeOptions.overrides.MuiTextField = {
-				root: {
-					backgroundColor, color,
-				}
+			themeOptions.props = {}
+			themeOptions.props.MuiTextField = {
+				inputProps: {
+					style: { backgroundColor, color, },
+				},
 			}
 		}
 		const theme = createMuiTheme(themeOptions)

@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Paper from '@material-ui/core/Paper'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles'
@@ -41,6 +42,24 @@ const styles = (theme: Theme) => createStyles({
 	},
 	rulesUi: {
 		marginBottom: '1em',
+	},
+	ruleExactMatch: {
+		width: '70%',
+	},
+	rulePattern: {
+		width: '70%',
+	},
+	ruleFlags: {
+		width: '10%',
+	},
+	longInput: {
+		width: '90%',
+	},
+	appSection: {
+		marginBottom: '1em',
+		marginTop: '1em',
+		paddingBottom: '1em',
+		paddingTop: '1em',
 	},
 	ruleSection: {
 		marginLeft: '3%',
@@ -94,6 +113,17 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	}
 
 	setRules(rules: RulesSettings): void {
+		// Don't let rules be invalid.
+		for (const app of rules.apps) {
+			for (const rule of app.rules) {
+				if (rule.messageExactMatch === undefined && rule.messagePattern === undefined) {
+					rule.messageExactMatch = ""
+				}
+				if (!Array.isArray(rule.responses) || rule.responses.length === 0) {
+					rule.responses = [""]
+				}
+			}
+		}
 		this.setState({ rulesJson: JSON.stringify(rules, null, 4) })
 	}
 
@@ -183,9 +213,6 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 
 	updateRules(path: string, value: string | undefined | object): void {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
-		if (value === "") {
-			value = undefined
-		}
 		jp.value(rules, path, value)
 		this.setRules(rules)
 	}
@@ -208,160 +235,124 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			</div>
 		}
 
-		let inputBackground: string | undefined = undefined, inputColor: string | undefined = undefined
-		const { themePreference } = this.state
-		if (themePreference === 'dark' || (themePreference === 'device' && isDarkModePreferred())) {
-			inputBackground = DARK_MODE_INPUT_BACKGROUND_COLOR
-			inputColor = DARK_MODE_INPUT_COLOR
-		}
-
 		return <div className={classes.rulesUi}>
 			{rules.apps.map((settings, appIndex) => {
 				const defaults = APP_DEFAULTS[settings.name]
-				return <div key={`rules-${appIndex}`}>
-					{/* Labels on TextFields don't work well when rendered dynamically */}
-					{/* TODO Move labels to messages.json */}
-					<Typography component="p">
-						{"App name (only \"teams\" is supported for now)"}
-					</Typography>
-					<TextField name='onhelloAppName' required
-						key={`appName-${appIndex}`}
-						variant="outlined"
-						type="text"
-						placeholder={"teams"}
-						value={settings.name}
-						onChange={(event) => this.updateRules(`$.apps[${appIndex}].name`, event.target.value)}
-						inputProps={{ style: { color: inputColor, backgroundColor: inputBackground, } }}
-						style={{ display: 'block', }}
-					/>
-					<Typography component="p">
-						{"URL pattern of requests to get messages. Leave the default value if you're not sure what to put."}
-					</Typography>
-					<TextField name='onhelloUrlPattern'
-						key={`urlPattern-${appIndex}`}
-						variant="outlined"
-						value={settings.urlPattern || ""}
-						placeholder={defaults ? defaults.urlPattern : undefined}
-						onChange={(event) => this.updateRules(`$.apps[${appIndex}].urlPattern`, event.target.value)}
-						inputProps={{
-							style: {
-								color: inputColor, backgroundColor: inputBackground,
-								width: '400px',
-							}
-						}}
-						style={{ display: 'block', }}
-					/>
-					<Typography component="p">
-						{"Reply URL. Leave the default value if you're not sure what to put."}
-					</Typography>
-					<TextField name='onhelloReplyUrl'
-						variant="outlined"
-						value={settings.replyUrl || ""}
-						placeholder={defaults ? defaults.replyUrl : undefined}
-						onChange={(event) => this.updateRules(`$.apps[${appIndex}].replyUrl`, event.target.value)}
-						inputProps={{
-							style: {
-								color: inputColor, backgroundColor: inputBackground,
-								// TODO Make responsive and shrink with page.
-								width: '800px',
-							},
-						}}
-						style={{ display: 'block', }}
-					/>
-					{settings.rules.map((rule, ruleIndex) => {
-						return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}
-							className={classes.ruleSection}
-						>
-							{/* TODO Add "Delete" button. */}
-							<Typography component="h6" variant="h6" style={{ marginTop: '0.5em' }}>
-								{`${settings.name} Rule ${ruleIndex + 1}`}
-							</Typography>
-							<Button className={classes.button}
-								color="secondary"
-								onClick={() => { this.deleteRule(appIndex, ruleIndex) }}>
-								{getMessage('deleteRule') || "Delete Rule"}
-							</Button>
-							<Typography component="p">
-								{"Exact Match"}
-							</Typography>
-							<TextField
-								variant="outlined"
-								value={rule.messageExactMatch || ""}
-								onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messageExactMatch`, event.target.value)}
-								inputProps={{
-									style: {
-										color: inputColor, backgroundColor: inputBackground,
-									}
-								}}
-								style={{ display: 'block' }}
-							/>
-							<div style={{ display: 'block' }}>
+				return <Paper key={`rules-${appIndex}`} className={classes.appSection}>
+					<Container>
+						{/* Labels on TextFields don't work well when rendered dynamically */}
+						{/* TODO Move labels to messages.json */}
+						<Typography component="p">
+							{"App name (only \"teams\" is supported for now)"}
+						</Typography>
+						<TextField name='onhelloAppName' required
+							key={`appName-${appIndex}`}
+							variant="outlined"
+							type="text"
+							placeholder={"teams"}
+							value={settings.name}
+							onChange={(event) => this.updateRules(`$.apps[${appIndex}].name`, event.target.value)}
+							style={{ display: 'block', }}
+						/>
+						<Typography component="p">
+							{"URL pattern of requests to get messages. Leave the default value if you're not sure what to put."}
+						</Typography>
+						<TextField name='onhelloUrlPattern'
+							key={`urlPattern-${appIndex}`}
+							fullWidth
+							className={classes.longInput}
+							variant="outlined"
+							value={settings.urlPattern || ""}
+							placeholder={defaults ? defaults.urlPattern : undefined}
+							onChange={(event) => this.updateRules(`$.apps[${appIndex}].urlPattern`, event.target.value)}
+							style={{ display: 'block', }}
+						/>
+						<Typography component="p">
+							{"Reply URL. Leave the default value if you're not sure what to put."}
+						</Typography>
+						<TextField name='onhelloReplyUrl'
+							fullWidth
+							className={classes.longInput}
+							variant="outlined"
+							value={settings.replyUrl || ""}
+							placeholder={defaults ? defaults.replyUrl : undefined}
+							onChange={(event) => this.updateRules(`$.apps[${appIndex}].replyUrl`, event.target.value)}
+							style={{ display: 'block', }}
+						/>
+						{settings.rules.map((rule, ruleIndex) => {
+							return <div key={`rule-${settings.name}-${appIndex}-${ruleIndex}`}
+								className={classes.ruleSection}
+							>
+								<Typography component="h6" variant="h6" style={{ marginTop: '0.5em' }}>
+									{`${settings.name} Rule ${ruleIndex + 1}`}
+								</Typography>
+								<Button className={classes.button}
+									color="secondary"
+									onClick={() => { this.deleteRule(appIndex, ruleIndex) }}>
+									{getMessage('deleteRule') || "Delete Rule"}
+								</Button>
 								<Typography component="p">
-									{"Pattern (optional) (You can use a Regular Expression - enter flags in the next box such as \"i\" (with no quotes) for ignore case)"}
+									{"Exact Match"}
 								</Typography>
 								<TextField
+									className={classes.ruleExactMatch}
 									variant="outlined"
-									value={rule.messagePattern || ""}
-									inputProps={{
-										style: {
-											color: inputColor, backgroundColor: inputBackground,
-											// TODO Make responsive and shrink with page.
-											width: '700px',
-										}
-									}}
-									onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messagePattern`, event.target.value)}
-									style={{ marginRight: '1em' }}
+									value={rule.messageExactMatch || ""}
+									onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messageExactMatch`, event.target.value)}
+									style={{ display: 'block' }}
 								/>
-								<TextField
-									variant="outlined"
-									value={rule.regexFlags || ""}
-									placeholder="i"
-									inputProps={{
-										style: {
-											color: inputColor, backgroundColor: inputBackground,
-										}
-									}}
-									onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].regexFlags`, event.target.value)}
-								/>
+								<div style={{ display: 'block' }}>
+									<Typography component="p">
+										{getMessage('rulesRegexInstructions')}
+									</Typography>
+									<TextField
+										className={classes.rulePattern}
+										variant="outlined"
+										value={rule.messagePattern || ""}
+										placeholder="pattern"
+										onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].messagePattern`, event.target.value)}
+										style={{ marginRight: '1em' }}
+									/>
+									<TextField
+										className={classes.ruleFlags}
+										variant="outlined"
+										value={rule.regexFlags || ""}
+										placeholder="flags"
+										onChange={(event) => this.updateRules(`$.apps[${appIndex}].rules[${ruleIndex}].regexFlags`, event.target.value)}
+									/>
+								</div>
+								<Typography component="p">
+									{getMessage('responsesInstructions')}
+								</Typography>
+								{rule.responses.map((response, responseIndex) => {
+									return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
+										className={classes.longInput}
+										fullWidth
+										variant="outlined"
+										value={response}
+										// TODO Allow clicking Enter to add a response.
+										onChange={(event) => { this.setResponse(appIndex, ruleIndex, responseIndex, event.target.value) }}
+										style={{ display: 'block', marginBottom: '2px', }}
+									/>
+								})}
+								<Button className={classes.button}
+									onClick={() => { this.setResponse(appIndex, ruleIndex, rule.responses.length, "") }}>
+									{getMessage('addResponseButton') || "Add Response"}
+								</Button>
 							</div>
-							<Typography component="p">
-								{"Responses. One will be randomly selected."}
-							</Typography>
-							{rule.responses.map((response, responseIndex) => {
-								return <TextField key={`response-${settings.name}-${appIndex}-${ruleIndex}-${responseIndex}`}
-									variant="outlined"
-									value={response}
-									// TODO Allow clicking Enter to add a response.
-									onChange={(event) => { this.setResponse(appIndex, ruleIndex, responseIndex, event.target.value) }}
-									inputProps={{
-										style: {
-											color: inputColor, backgroundColor: inputBackground,
-											// TODO Make responsive and shrink with page.
-											width: '700px',
-										}
-									}}
-									style={{ display: 'block', marginBottom: '2px', }}
-								/>
-							})}
-							<Button className={classes.button}
-								onClick={() => { this.setResponse(appIndex, ruleIndex, rule.responses.length, "") }}>
-								{getMessage('addResponseButton') || "Add Response"}
-							</Button>
-						</div>
-					})}
-					<Button className={`${classes.button} ${classes.ruleSection}`}
-						onClick={() => this.updateRules(`$.apps[${appIndex}].rules[${settings.rules.length}]`, {
-							messageExactMatch: "",
-							responses: [""],
-						} as Rule)}
-					>
-						{getMessage('addRule') || "Add Rule"}
-					</Button>
-				</div>
+						})}
+						<Button className={classes.button}
+							onClick={() => this.updateRules(`$.apps[${appIndex}].rules[${settings.rules.length}]`, {
+								messageExactMatch: "",
+								responses: [""],
+							} as Rule)}
+						>
+							{getMessage('addRule') || "Add Rule"}
+						</Button>
+					</Container>
+				</Paper>
 			})}
 			<Button className={classes.button}
-				// Not needed yet.
-				style={{ display: 'none' }}
 				onClick={() => this.updateRules(`$.apps[${rules.apps.length}]`, {
 					name: "teams",
 					rules: [{
@@ -464,17 +455,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					{getMessage('testRulesInfo')}
 				</Typography>
 				<TextField required
+					fullWidth
+					className={classes.longInput}
 					variant="outlined"
-					type="text"
 					placeholder={"Hello"}
 					value={this.state.ruleTestText || ""}
 					onChange={(event) => this.testRules(event.target.value)}
-					inputProps={{
-						style: {
-							color: inputColor, backgroundColor: inputBackground,
-							width: '700px',
-						}
-					}}
 					style={{ display: 'block', }}
 				/>
 			</div>
