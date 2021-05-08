@@ -236,7 +236,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		})
 	}
 
-	updateRules(path: string, value: string | undefined | object): void {
+	updateRules(path: string, value: any): void {
 		const rules: RulesSettings = JSON.parse(this.state.rulesJson)
 		jp.value(rules, path, value)
 		this.setRules(rules)

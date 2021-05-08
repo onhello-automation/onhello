@@ -15,6 +15,6 @@ getRules().then(rules => {
 	s.src = browser.extension.getURL('scripts/injected.js')
 	s.onload = async function () {
 		(this as any).remove()
-	};
+	}
 	{ (document.head || document.documentElement).appendChild(s) }
 })
