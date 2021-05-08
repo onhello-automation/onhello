@@ -9,7 +9,6 @@ export function isDarkModePreferred(): boolean {
 	return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-// Setting these in the theme doesn't work.
 export const DARK_MODE_INPUT_BACKGROUND_COLOR = '#303030'
 export const DARK_MODE_INPUT_COLOR = '#eee'
 
