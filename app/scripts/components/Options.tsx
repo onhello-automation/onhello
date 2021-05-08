@@ -15,6 +15,7 @@ import React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
+import { getResponse } from '../response'
 import { APP_DEFAULTS, checkRules, Rule, Rules, RulesSettings } from '../rules/rules'
 import { setupUserSettings, ThemePreferenceType } from '../user'
 import { DARK_MODE_INPUT_BACKGROUND_COLOR, DARK_MODE_INPUT_COLOR, isDarkModePreferred } from './AppTheme'
@@ -29,11 +30,18 @@ const styles = (theme: Theme) => createStyles({
 	buttonHolder: {
 		paddingTop: '4px',
 	},
-	themeSelection: {
+	radioSelection: {
 		marginLeft: theme.spacing(2),
 	},
 	instructions: {
 		marginBottom: '1em',
+	},
+	testRulesResponseSection: {
+		marginBottom: '1em',
+		marginTop: '1em',
+		paddingBottom: '1em',
+		paddingTop: '1em',
+		minHeight: '4em',
 	},
 	button: {
 		color: 'black',
@@ -54,6 +62,7 @@ const styles = (theme: Theme) => createStyles({
 	},
 	longInput: {
 		width: '90%',
+		marginBottom: '1em',
 	},
 	appSection: {
 		marginBottom: '1em',
@@ -77,7 +86,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	themePreference: ThemePreferenceType | ''
 	rulesJson: string
 	errorInRules: string | undefined
-	ruleTestText: string
+	rulesTestText: string
+	rulesTestApp: string
+	rulesTestResponse: string
 }> {
 	private errorHandler = new ErrorHandler(undefined)
 
@@ -87,7 +98,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			themePreference: '',
 			rulesJson: '',
 			errorInRules: undefined,
-			ruleTestText: "",
+			rulesTestText: "",
+			rulesTestApp: 'teams',
+			rulesTestResponse: "",
 		}
 
 		this.deleteRule = this.deleteRule.bind(this)
@@ -204,11 +217,23 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		this.setRules(rules)
 	}
 
-	testRules(text: string): void {
+	testRules(rulesTestText: string): void {
+		const { rulesTestApp } = this.state
+		const settings: RulesSettings = JSON.parse(this.state.rulesJson)
+
+		const rules = settings.apps.find(app => app.name === rulesTestApp)
+		let rulesTestResponse = ""
+		if (rules) {
+			// Should always be found.
+			const response = getResponse("First_Name Last_Name", rulesTestText, rules.rules)
+			if (response) {
+				rulesTestResponse = response.text
+			}
+		}
 		this.setState({
-			ruleTestText: text,
+			rulesTestText,
+			rulesTestResponse,
 		})
-		// TODO
 	}
 
 	updateRules(path: string, value: string | undefined | object): void {
@@ -366,6 +391,66 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		</div >
 	}
 
+	renderRulesTestSection(): React.ReactNode {
+		if (this.state.errorInRules) {
+			return <div></div>
+		}
+		const { classes } = this.props
+
+		// Extra check just in case.
+		let rules: RulesSettings
+		try {
+			rules = JSON.parse(this.state.rulesJson)
+			checkRules(rules)
+		} catch (err) {
+			return <div className={classes.rulesInputError}>
+				{`${err}`}
+			</div>
+		}
+
+		return <div className={classes.section}>
+			<Typography component="h5" variant="h5" className={classes.instructions}>
+				{getMessage('testRulesSectionTitle')}
+			</Typography>
+			<FormControl className={classes.radioSelection} component="fieldset">
+				<Typography component="p" className={classes.instructions}>
+					{getMessage('testRulesAppSelectionTitle') || "App"}
+				</Typography>
+				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestApp} onChange={(event) => {
+					this.setState({ rulesTestApp: event.target.value })
+				}}>
+					{rules.apps.map((app, appIndex) => {
+						return <FormControlLabel
+							key={`testRules-app-selection-${appIndex}`}
+							value={app.name} control={<Radio />} label={app.name} />
+					})}
+				</RadioGroup>
+			</FormControl>
+			<Typography component="p" className={classes.instructions}>
+				{getMessage('testRulesInstructions')}
+			</Typography>
+			<TextField
+				fullWidth
+				className={classes.longInput}
+				variant="outlined"
+				placeholder={"Enter your message"}
+				value={this.state.rulesTestText || ""}
+				onChange={(event) => this.testRules(event.target.value)}
+				style={{ display: 'block', }}
+			/>
+			<Typography component="p" className={classes.instructions}>
+				{getMessage('testRulesResponse')}
+			</Typography>
+			<Paper className={classes.testRulesResponseSection}>
+				<Container>
+					<Typography component="p">
+						{this.state.rulesTestResponse}
+					</Typography>
+				</Container>
+			</Paper>
+		</div>
+	}
+
 	render(): React.ReactNode {
 		const { classes } = this.props
 
@@ -388,7 +473,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="p">
 					{getMessage('themePreferenceDescription')}
 				</Typography>
-				<FormControl className={classes.themeSelection} component="fieldset">
+				<FormControl className={classes.radioSelection} component="fieldset">
 					<RadioGroup aria-label="theme" name="theme" value={this.state.themePreference} onChange={this.handleThemeChange}>
 						<FormControlLabel value="light" control={<Radio />} label="Light" />
 						<FormControlLabel value="dark" control={<Radio />} label="Dark" />
@@ -396,6 +481,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					</RadioGroup>
 				</FormControl>
 			</div>
+			{this.renderRulesTestSection()}
 			<div className={classes.section}>
 				<Typography component="h5" variant="h5">
 					{getMessage('rulesSectionTitle') || "Rules"}
@@ -446,23 +532,6 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 						{getMessage('saveRules')}
 					</Button>
 				</div>
-			</div>
-			<div className={classes.section}>
-				<Typography component="h5" variant="h5">
-					{getMessage('testRulesSectionTitle') || "Test Your Rules"}
-				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('testRulesInfo')}
-				</Typography>
-				<TextField required
-					fullWidth
-					className={classes.longInput}
-					variant="outlined"
-					placeholder={"Hello"}
-					value={this.state.ruleTestText || ""}
-					onChange={(event) => this.testRules(event.target.value)}
-					style={{ display: 'block', }}
-				/>
 			</div>
 			<div className={classes.section}>
 				<Typography component="h5" variant="h5">

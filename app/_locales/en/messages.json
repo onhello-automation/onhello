@@ -24,6 +24,18 @@
 	"themePreferenceDescription": {
 		"message": "Changing the theme will not effect this page until you reload the page."
 	},
+	"testRulesSectionTitle": {
+		"message": "✍🏻 Test Your Rules"
+	},
+	"testRulesAppSelectionTitle": {
+		"message": "App"
+	},
+	"testRulesInstructions": {
+		"message": "Enter some text and see which rule matches first."
+	},
+	"testRulesResponse": {
+		"message": "Response:"
+	},
 	"rulesSectionTitle": {
 		"message": "🤖 Rules"
 	},
@@ -48,7 +60,7 @@
 	"addRule": {
 		"message": "➕ Add Rule"
 	},
-	"addApp":{
+	"addApp": {
 		"message": "🌐 Add App"
 	},
 	"saveInstructions": {
@@ -62,12 +74,6 @@
 	},
 	"rulesRawInstructions": {
 		"message": "What a more advanced view of your rules? Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
-	},
-	"testRulesSectionTitle": {
-		"message": "✍🏻 Test Your Rules"
-	},
-	"testRulesInfo": {
-		"message": "Enter some text and see which rule matches first."
 	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"

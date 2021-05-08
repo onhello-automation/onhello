@@ -8,14 +8,13 @@ getRules().then(rules => {
 	const rulesScript = document.createElement('script')
 	// Add extra escaping to help with escaping quotes and backslashes properly.
 	const rulesString = JSON.stringify(JSON.stringify(rules))
-	rulesScript.textContent = `window._onhelloRules = JSON.parse(${rulesString});`;
-
-	(document.head || document.documentElement).appendChild(rulesScript)
+	rulesScript.textContent = `window._onhelloRules = JSON.parse(${rulesString});`
+	{ (document.head || document.documentElement).appendChild(rulesScript) }
 
 	const s = document.createElement('script')
 	s.src = browser.extension.getURL('scripts/injected.js')
 	s.onload = async function () {
 		(this as any).remove()
 	};
-	(document.head || document.documentElement).appendChild(s)
+	{ (document.head || document.documentElement).appendChild(s) }
 })
