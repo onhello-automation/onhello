@@ -24,6 +24,18 @@
 	"themePreferenceDescription": {
 		"message": "Changing the theme will not effect this page until you reload the page."
 	},
+	"testRulesSectionTitle": {
+		"message": "✍🏻 Test Your Rules"
+	},
+	"testRulesAppSelectionTitle": {
+		"message": "App"
+	},
+	"testRulesInstructions": {
+		"message": "Enter some text and see which rule matches first."
+	},
+	"testRulesResponse": {
+		"message": "Response:"
+	},
 	"rulesSectionTitle": {
 		"message": "🤖 Rules"
 	},
@@ -33,8 +45,23 @@
 	"rulesResponsesInstructions": {
 		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
 	},
+	"rulesRegexInstructions": {
+		"message": "Pattern (optional): use a JavaScript compatible Regular Expression. Matches will be found anywhere in the message so use \"^\" to match the beginning of the message and \"$\" to match the end of the message. You can put flags in the next box such as \"i\" (with no quotes) for ignore case."
+	},
+	"deleteRule": {
+		"message": "❌ Delete Rule"
+	},
+	"responsesInstructions": {
+		"message": "Responses. One will be randomly selected. You can use HTML in your responses."
+	},
 	"addResponseButton": {
-		"message": "Add Response"
+		"message": "➕ Add Response"
+	},
+	"addRule": {
+		"message": "➕ Add Rule"
+	},
+	"addApp": {
+		"message": "🌐 Add App"
 	},
 	"saveInstructions": {
 		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
