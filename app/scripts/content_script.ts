@@ -1,5 +1,6 @@
 import { browser } from 'webextension-polyfill-ts'
-import { applyDefaults, getRules } from './rules/get_rules'
+import { getRules } from './rules/get_rules'
+import { applyDefaults } from './rules/rules'
 
 getRules().then(rules => {
 	// I tried so many ways to get the rules into the page, this seems like one of the only ways because

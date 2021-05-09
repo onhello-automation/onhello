@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Link from '@material-ui/core/Link'
 import Paper from '@material-ui/core/Paper'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
@@ -12,6 +13,7 @@ import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import jp from 'jsonpath'
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
@@ -35,6 +37,7 @@ const styles = (theme: Theme) => createStyles({
 	},
 	instructions: {
 		marginBottom: '1em',
+		fontSize: '1rem',
 	},
 	testRulesResponseSection: {
 		marginBottom: '1em',
@@ -74,7 +77,8 @@ const styles = (theme: Theme) => createStyles({
 		marginLeft: '3%',
 	},
 	rulesInput: {
-		width: '80%'
+		width: '95%',
+		fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace',
 	},
 	rulesInputError: {
 		borderColor: 'red',
@@ -87,7 +91,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	rulesJson: string
 	errorInRules: string | undefined
 	rulesTestText: string
-	rulesTestApp: string
+	rulesTestAppIndex: number
 	rulesTestResponse: string
 }> {
 	private errorHandler = new ErrorHandler(undefined)
@@ -99,7 +103,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			rulesJson: '',
 			errorInRules: undefined,
 			rulesTestText: "",
-			rulesTestApp: 'teams',
+			rulesTestAppIndex: 0,
 			rulesTestResponse: "",
 		}
 
@@ -218,14 +222,14 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	}
 
 	testRules(rulesTestText: string): void {
-		const { rulesTestApp } = this.state
+		const { rulesTestAppIndex } = this.state
 		const settings: RulesSettings = JSON.parse(this.state.rulesJson)
 
-		const rules = settings.apps.find(app => app.name === rulesTestApp)
+		const rules = settings.apps[rulesTestAppIndex]
 		let rulesTestResponse = ""
 		if (rules) {
 			// Should always be found.
-			const response = getResponse("First_Name Last_Name", rulesTestText, rules.rules)
+			const response = getResponse(getMessage('testRulesSenderName') || "First_Name Last_Name", rulesTestText, rules.rules)
 			if (response) {
 				rulesTestResponse = response.text
 			}
@@ -416,13 +420,15 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="p" className={classes.instructions}>
 					{getMessage('testRulesAppSelectionTitle') || "App"}
 				</Typography>
-				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestApp} onChange={(event) => {
-					this.setState({ rulesTestApp: event.target.value })
+				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestAppIndex} onChange={(event) => {
+					this.setState({ rulesTestAppIndex: parseInt(event.target.value, 10) }, () => {
+						this.testRules(this.state.rulesTestText)
+					})
 				}}>
 					{rules.apps.map((app, appIndex) => {
 						return <FormControlLabel
 							key={`testRules-app-selection-${appIndex}`}
-							value={app.name} control={<Radio />} label={app.name} />
+							value={appIndex} control={<Radio />} label={app.name} />
 					})}
 				</RadioGroup>
 			</FormControl>
@@ -486,12 +492,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('rulesSectionTitle') || "Rules"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesInstructions')}
-				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesResponsesInstructions')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('rulesInstructions') || ""}
+				</ReactMarkdown>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('rulesResponsesInstructions') || ""}
+				</ReactMarkdown>
 				{/* Rules UI */}
 				{this.renderRulesUi()}
 				<Typography component="p">
@@ -509,9 +515,10 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('rawRulesSectionTitle') || "Raw Rules"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesRawInstructions')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}
+					components={{ a: Link }}>
+					{getMessage('rawRulesInstructions') || ""}
+				</ReactMarkdown>
 				{this.state.errorInRules && <Typography component="p" className={`${classes.instructions} ${classes.rulesInputError}`}>
 					{this.state.errorInRules}
 				</Typography>}
@@ -537,9 +544,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('advancedSectionTitle') || "Advanced"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('advancedInfo')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('advancedInfo') || ""}
+				</ReactMarkdown>
 			</div>
 		</Container >
 	}

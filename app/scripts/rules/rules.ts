@@ -1,13 +1,15 @@
 export type AppName = 'teams'
 
+/**
+ * The object representing all of the user's rules.
+ */
 export interface RulesSettings {
+	/** When the rules were last modified. */
 	dateModified?: Date
+	/** The apps for which the user has rules. */
 	apps: Rules[]
-}
-
-export interface AppDefaults {
-	urlPattern: string
-	replyUrl: string
+	// TODO Support global rules to run AFTER app specific rules.
+	// globalRules: Rule[]
 }
 
 export interface Rules {
@@ -17,10 +19,27 @@ export interface Rules {
 	 */
 	name: AppName
 	urlPattern?: string
+	/**
+	 * The JSON path for the events in the response body.
+	 */
+	eventsPath?: string
+	/**
+	 * Mainly for Teams.
+	 * Helps detect who a message came from.
+	 */
+	eventFromUrlPath?: string
+	eventComposeTimePath?: string
+	eventDisplayNamePath?: string
+	eventToIdPath?: string
+	eventMessageTextPath?: string
 	replyUrl?: string
+
 	rules: Rule[]
 }
 
+/**
+ * A rule to respond to a message.
+ */
 export interface Rule {
 	messageExactMatch?: string
 	messagePattern?: string
@@ -33,10 +52,30 @@ export interface Rule {
 	responses: string[]
 }
 
+export interface AppDefaults {
+	urlPattern: string
+	eventsPath: string
+	eventFromUrlPath?: string
+	eventComposeTimePath?: string
+	eventDisplayNamePath?: string
+	eventToIdPath?: string
+	eventMessageTextPath?: string
+	replyUrl: string
+}
+
+/**
+ * Defaults to supply when the user doesn't set them.
+ */
 export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 	teams: {
 		urlPattern: '^https://.*teams.(microsoft|live).com/.*/poll$',
-		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
+		eventsPath: '$.eventMessages[?(@.type==\'EventMessage\' && @.resourceType==\'NewMessage\')]',
+		eventFromUrlPath: '$.resource..from',
+		eventComposeTimePath: '$.resource..composetime',
+		eventDisplayNamePath: '$.resource..imdisplayname',
+		eventToIdPath: '$.resource..to',
+		eventMessageTextPath: '$.resource..content',
+		replyUrl: 'https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages',
 		// TODO Add JSON paths of where to get the message, sender name, etc.
 	}
 }
@@ -72,6 +111,17 @@ export const DEFAULT_RULES: RulesSettings = {
 			]
 		},
 	]
+}
+
+export function applyDefaults(rules: RulesSettings): void {
+	for (const app of rules.apps) {
+		const defaults = APP_DEFAULTS[app.name]
+		for (const [key, val] of Object.entries(defaults)) {
+			if ((app as any)[key] === undefined && val !== undefined) {
+				(app as any)[key] = val
+			}
+		}
+	}
 }
 
 export function checkRules(rules: RulesSettings): void {
