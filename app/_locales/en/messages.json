@@ -8,7 +8,7 @@
 		"description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name"
 	},
 	"appDescription": {
-		"message": "Automatically reply to messages in Teams.",
+		"message": "Automatically reply to messages in Microsoft Teams.",
 		"description": "The description of the application"
 	},
 	"browserActionTitle": {
@@ -67,7 +67,7 @@
 		"message": "🌐 Add App"
 	},
 	"saveInstructions": {
-		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect."
+		"message": "After saving, you must refresh the tab of your chat application for the changes to take effect. If you're using the Edge browser, then you should make sure your tab does not get put to sleep. Go to edge://settings/?search=sleep if you have sleeping tabs enabled, then make sure that teams.microsoft.com (or teams.live.com if you're using that) is added to the list of sites not to put to sleep."
 	},
 	"saveRules": {
 		"message": "Save Rules"
