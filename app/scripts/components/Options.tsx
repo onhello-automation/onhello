@@ -229,7 +229,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		let rulesTestResponse = ""
 		if (rules) {
 			// Should always be found.
-			const response = getResponse("First_Name Last_Name", rulesTestText, rules.rules)
+			const response = getResponse(getMessage('testRulesSenderName') || "First_Name Last_Name", rulesTestText, rules.rules)
 			if (response) {
 				rulesTestResponse = response.text
 			}

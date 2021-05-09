@@ -33,6 +33,9 @@
 	"testRulesInstructions": {
 		"message": "Enter some text and see which rule matches first."
 	},
+	"testRulesSenderName": {
+		"message": "First_Name Last_Name"
+	},
 	"testRulesResponse": {
 		"message": "Response:"
 	},
