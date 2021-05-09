@@ -413,7 +413,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 		}
 
 		return <div className={classes.section}>
-			<Typography component="h5" variant="h5" className={classes.instructions}>
+			<Typography component="h5" variant="h5">
 				{getMessage('testRulesSectionTitle')}
 			</Typography>
 			<FormControl className={classes.radioSelection} component="fieldset">
