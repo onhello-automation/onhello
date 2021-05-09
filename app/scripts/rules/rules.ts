@@ -3,6 +3,8 @@ export type AppName = 'teams'
 export interface RulesSettings {
 	dateModified?: Date
 	apps: Rules[]
+	// TODO Support global rules to run AFTER app specific rules.
+	// globalRules: Rule[]
 }
 
 export interface AppDefaults {
@@ -18,6 +20,7 @@ export interface Rules {
 	name: AppName
 	urlPattern?: string
 	replyUrl?: string
+	
 	rules: Rule[]
 }
 

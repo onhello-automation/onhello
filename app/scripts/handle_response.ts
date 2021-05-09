@@ -8,13 +8,29 @@ declare global {
 	}
 }
 
-export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void> {
+export interface HandleResponseMatch {
+	from: string
+	messageText: string
+	toId: string
+	response?: Response
+}
+
+export interface HandleResponseResult {
+	matches: HandleResponseMatch[]
+}
+
+export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules, sendMethod = sendMessage): Promise<HandleResponseResult | undefined> {
 	if (window._onhelloHandleResponse) {
 		window._onhelloHandleResponse(url, responseBody, requestHeaders, settings)
 		return
 	}
+
 	// Handle Teams response.
 	// Eventually the rules will have JSON paths to know how to handle messages for different sites.
+	// jsonpath.query(responseBody, settings.)
+	const result: HandleResponseResult = {
+		matches: []
+	}
 	if (responseBody && Array.isArray(responseBody.eventMessages) && responseBody.eventMessages.length > 0) {
 		for (const event of responseBody.eventMessages) {
 			// console.debug("onhello: handle: event:", event, requestHeaders)
@@ -51,19 +67,27 @@ export async function handleResponse(url: string, responseBody: any, requestHead
 				}
 				if (messageText) {
 					console.debug(`onhello: Got "${messageText}" from "${from}".`)
-					let response
+					let response: Response | undefined
 					if (window._onhelloGetResponse) {
 						response = window._onhelloGetResponse(from, messageText, settings.rules)
 					} else {
 						response = getResponse(from, messageText, settings.rules)
 					}
 					if (response) {
-						sendMessage(from, response, toId, requestHeaders, settings)
+						sendMethod(from, response, toId, requestHeaders, settings)
 					}
+					result.matches.push({
+						from,
+						messageText,
+						toId,
+						response,
+					})
 				}
 			}
 		}
 	}
+
+	return result
 }
 
 /**
