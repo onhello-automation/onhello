@@ -3,7 +3,8 @@ import blue from '@material-ui/core/colors/blue'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { createMuiTheme } from '@material-ui/core/styles'
 import React from 'react'
-import { setupUserSettings } from '../user'
+import { browser } from 'webextension-polyfill-ts'
+import { setupUserSettings, ThemePreferenceType } from '../user'
 
 export function isDarkModePreferred(): boolean {
 	return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -30,16 +31,28 @@ export class AppTheme extends React.Component<Props, {
 		}
 	}
 
+	mapThemePreference(themePreference: ThemePreferenceType | undefined): 'dark' | 'light' {
+		if (themePreference === undefined || themePreference === 'device') {
+			return isDarkModePreferred() ? 'dark' : 'light'
+		}
+		return themePreference
+	}
+
 	async componentDidMount(): Promise<void> {
 		let { themePreference } = await setupUserSettings(['themePreference'])
-		if (themePreference === undefined || themePreference === 'device') {
-			themePreference = isDarkModePreferred() ? 'dark' : 'light'
-		}
+		themePreference = this.mapThemePreference(themePreference)
 		if (themePreference !== this.state.themePreference) {
 			this.setState({
 				themePreference,
 			})
 		}
+		browser.storage.onChanged.addListener((changes, areaName) => {
+			if (areaName === 'local' && changes.themePreference && changes.themePreference.newValue !== this.state.themePreference) {
+				this.setState({
+					themePreference: this.mapThemePreference(changes.themePreference.newValue),
+				})
+			}
+		})
 	}
 
 	render(): React.ReactNode {
