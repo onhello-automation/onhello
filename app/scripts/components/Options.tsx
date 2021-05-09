@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button'
 import Container from '@material-ui/core/Container'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Link from '@material-ui/core/Link'
 import Paper from '@material-ui/core/Paper'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
@@ -12,6 +13,7 @@ import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import jp from 'jsonpath'
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
 import { browser } from 'webextension-polyfill-ts'
 import { ErrorHandler } from '../error_handler'
 import { getMessage } from '../i18n_helper'
@@ -509,9 +511,10 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('rawRulesSectionTitle') || "Raw Rules"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesRawInstructions')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}
+					components={{ a: Link }}>
+					{getMessage('rawRulesInstructions') || ""}
+				</ReactMarkdown>
 				{this.state.errorInRules && <Typography component="p" className={`${classes.instructions} ${classes.rulesInputError}`}>
 					{this.state.errorInRules}
 				</Typography>}

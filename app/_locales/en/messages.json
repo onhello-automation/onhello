@@ -72,8 +72,8 @@
 	"rawRulesSectionTitle": {
 		"message": "Raw Rules"
 	},
-	"rulesRawInstructions": {
-		"message": "What a more advanced view of your rules? Below is a raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. "
+	"rawRulesInstructions": {
+		"message": "Here's a more advanced raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. See [rules.ts](https://github.com/onhello-automation/onhello/blob/main/app/scripts/rules/rules.ts) for more details and other fields that you can use to customize how values are retrieved."
 	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"
