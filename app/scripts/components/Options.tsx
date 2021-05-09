@@ -37,6 +37,7 @@ const styles = (theme: Theme) => createStyles({
 	},
 	instructions: {
 		marginBottom: '1em',
+		fontSize: '1rem',
 	},
 	testRulesResponseSection: {
 		marginBottom: '1em',
@@ -76,7 +77,8 @@ const styles = (theme: Theme) => createStyles({
 		marginLeft: '3%',
 	},
 	rulesInput: {
-		width: '80%'
+		width: '95%',
+		fontFamily: 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace',
 	},
 	rulesInputError: {
 		borderColor: 'red',
@@ -419,7 +421,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 					{getMessage('testRulesAppSelectionTitle') || "App"}
 				</Typography>
 				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestAppIndex} onChange={(event) => {
-					this.setState({ rulesTestAppIndex: parseInt(event.target.value, 10) }, ()=>{
+					this.setState({ rulesTestAppIndex: parseInt(event.target.value, 10) }, () => {
 						this.testRules(this.state.rulesTestText)
 					})
 				}}>
@@ -490,12 +492,12 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('rulesSectionTitle') || "Rules"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesInstructions')}
-				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('rulesResponsesInstructions')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('rulesInstructions') || ""}
+				</ReactMarkdown>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('rulesResponsesInstructions') || ""}
+				</ReactMarkdown>
 				{/* Rules UI */}
 				{this.renderRulesUi()}
 				<Typography component="p">
@@ -542,9 +544,9 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="h5" variant="h5">
 					{getMessage('advancedSectionTitle') || "Advanced"}
 				</Typography>
-				<Typography component="p" className={classes.instructions}>
-					{getMessage('advancedInfo')}
-				</Typography>
+				<ReactMarkdown className={classes.instructions}>
+					{getMessage('advancedInfo') || ""}
+				</ReactMarkdown>
 			</div>
 		</Container >
 	}

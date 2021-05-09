@@ -43,7 +43,7 @@
 		"message": "Set up some rules for how to respond to messages. Make sure to click SAVE RULES below when you are done. You can match a message exactly or set up patterns (JavaScript regular expressions) to match more messages."
 	},
 	"rulesResponsesInstructions": {
-		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are: {{ FROM }} for the full name of the sender, {{ FROM_FIRST_NAME }} for just the first name (any characters before the first space in FROM) of the sender."
+		"message": "List a few possible responses and one will be randomly selected when making a reply. You can use HTML and some placeholders in the responses. The supported placeholders are:\n* `{{ FROM }}` for the full name of the sender,\n* `{{ FROM_FIRST_NAME }}` for just the first name (any characters before the first space in FROM) of the sender"
 	},
 	"rulesRegexInstructions": {
 		"message": "Pattern (optional): use a JavaScript compatible Regular Expression. Matches will be found anywhere in the message so use \"^\" to match the beginning of the message and \"$\" to match the end of the message. You can put flags in the next box such as \"i\" (with no quotes) for ignore case."
@@ -73,12 +73,12 @@
 		"message": "Raw Rules"
 	},
 	"rawRulesInstructions": {
-		"message": "Here's a more advanced raw view of your rules. Use \"messageExactMatch\" to match a message exactly or \"messagePattern\" when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in \"responses\", one will be picked randomly. See [rules.ts](https://github.com/onhello-automation/onhello/blob/main/app/scripts/rules/rules.ts) for more details and other fields that you can use to customize how values are retrieved."
+		"message": "Here's a more advanced raw view of your rules. Use `\"messageExactMatch\"` to match a message exactly or `\"messagePattern\"` when you want to use patterns (JavaScript regular expressions can be used). Set your reply options in `\"responses\"`, one will be picked randomly. See [rules.ts](https://github.com/onhello-automation/onhello/blob/main/app/scripts/rules/rules.ts) for more details and other fields that you can use to customize how values are retrieved."
 	},
 	"advancedSectionTitle": {
 		"message": "🤓 Advanced"
 	},
 	"advancedInfo": {
-		"message": "Looking for more customization? You can define some methods in your browser's Console or any other clever way you can think of: define `window._onhelloGetResponse(from: string, messageText: string, rules: Rule[]): {text: string, messageType: 'Text' | 'RichText/Html'}` to build a response to a message or define `window._onhelloHandleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void>` to directly handle a response to a web request. You will still need a list of \"apps\" defined in your rules."
+		"message": "Looking for more customization? You can define some methods in your browser's Console or any other clever way you can think of: define `window._onhelloGetResponse(from: string, messageText: string, rules: Rule[]): {text: string, messageType: 'Text' | 'RichText/Html'}` to build a response to a message or define `window._onhelloHandleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules): Promise<void>` to directly handle a response to a web request. You will still need a list of `\"apps\"` defined in your rules."
 	}
 }
