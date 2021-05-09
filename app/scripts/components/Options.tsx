@@ -89,7 +89,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	rulesJson: string
 	errorInRules: string | undefined
 	rulesTestText: string
-	rulesTestApp: string
+	rulesTestAppIndex: number
 	rulesTestResponse: string
 }> {
 	private errorHandler = new ErrorHandler(undefined)
@@ -101,7 +101,7 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 			rulesJson: '',
 			errorInRules: undefined,
 			rulesTestText: "",
-			rulesTestApp: 'teams',
+			rulesTestAppIndex: 0,
 			rulesTestResponse: "",
 		}
 
@@ -220,10 +220,10 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 	}
 
 	testRules(rulesTestText: string): void {
-		const { rulesTestApp } = this.state
+		const { rulesTestAppIndex } = this.state
 		const settings: RulesSettings = JSON.parse(this.state.rulesJson)
 
-		const rules = settings.apps.find(app => app.name === rulesTestApp)
+		const rules = settings.apps[rulesTestAppIndex]
 		let rulesTestResponse = ""
 		if (rules) {
 			// Should always be found.
@@ -418,13 +418,15 @@ class Options extends React.Component<WithStyles<typeof styles>, {
 				<Typography component="p" className={classes.instructions}>
 					{getMessage('testRulesAppSelectionTitle') || "App"}
 				</Typography>
-				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestApp} onChange={(event) => {
-					this.setState({ rulesTestApp: event.target.value })
+				<RadioGroup aria-label="theme" name="theme" value={this.state.rulesTestAppIndex} onChange={(event) => {
+					this.setState({ rulesTestAppIndex: parseInt(event.target.value, 10) }, ()=>{
+						this.testRules(this.state.rulesTestText)
+					})
 				}}>
 					{rules.apps.map((app, appIndex) => {
 						return <FormControlLabel
 							key={`testRules-app-selection-${appIndex}`}
-							value={app.name} control={<Radio />} label={app.name} />
+							value={appIndex} control={<Radio />} label={app.name} />
 					})}
 				</RadioGroup>
 			</FormControl>
