@@ -1,5 +1,6 @@
+import jsonpath from 'jsonpath'
 import { getResponse, Response } from './response'
-import { APP_DEFAULTS, Rule, Rules } from './rules/rules'
+import { Rule, Rules } from './rules/rules'
 
 declare global {
 	interface Window {
@@ -25,68 +26,79 @@ export async function handleResponse(url: string, responseBody: any, requestHead
 		return
 	}
 
-	// Handle Teams response.
-	// Eventually the rules will have JSON paths to know how to handle messages for different sites.
-	// jsonpath.query(responseBody, settings.)
 	const result: HandleResponseResult = {
 		matches: []
 	}
-	if (responseBody && Array.isArray(responseBody.eventMessages) && responseBody.eventMessages.length > 0) {
-		for (const event of responseBody.eventMessages) {
-			// console.debug("onhello: handle: event:", event, requestHeaders)
-			if (event.type === 'EventMessage' && event.resource && event.resourceType === 'NewMessage') {
-				let { resource } = event
-				if (resource.lastMessage) {
-					resource = resource.lastMessage
-				}
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	jsonpath.query(responseBody, settings.eventsPath!).forEach(event => {
+		// console.debug("onhello: handle: event:", event, requestHeaders)
+		if (settings.eventFromUrlPath) {
+			const from = jsonpath.value(event, settings.eventFromUrlPath)
+			if (from && isFromCurrentUser(from, url)) {
+				return
+			}
+		}
 
-				if (isFromCurrentUser(resource.from, url)) {
-					continue
-				}
-				if (resource.composetime) {
-					const sentTime = new Date(resource.composetime)
-					// Check if it was sent in the last 1 minute.
-					if (new Date().getTime() - sentTime.getTime() > 60 * 1000) {
-						continue
-					}
-				}
-				// const receivedTime = resource.originalarrivaltime
-				const from = resource.imdisplayname
-				const toId = resource.to
-				let messageText
-				// Other types: messagetype: "Control/Typing", contenttype: "Application/Message"
-				if (resource.messagetype === 'Text' && resource.contenttype === 'text') {
-					messageText = resource.content
-				} else if (resource.messagetype === 'RichText/Html' && resource.contenttype === 'text') {
-					messageText = resource.content
-					if (messageText) {
-						// Get rid of HTML tags.
-						// There are fancier ways to do this but they can cause issues if they try to render themselves.
-						messageText = messageText.replace(/<[^>]+>/g, '')
-					}
-				}
-				if (messageText) {
-					console.debug(`onhello: Got "${messageText}" from "${from}".`)
-					let response: Response | undefined
-					if (window._onhelloGetResponse) {
-						response = window._onhelloGetResponse(from, messageText, settings.rules)
-					} else {
-						response = getResponse(from, messageText, settings.rules)
-					}
-					if (response) {
-						sendMethod(from, response, toId, requestHeaders, settings)
-					}
-					result.matches.push({
-						from,
-						messageText,
-						toId,
-						response,
-					})
+		if (settings.eventComposeTimePath) {
+			const composeTime = jsonpath.value(event, settings.eventComposeTimePath)
+			if (composeTime) {
+				// Check if it was sent in the last 1 minute.
+				if (new Date().getTime() - new Date(composeTime).getTime() > 60 * 1000) {
+					return
 				}
 			}
 		}
-	}
 
+		let from = undefined,
+			toId = undefined
+		if (settings.eventDisplayNamePath) {
+			from = jsonpath.value(event, settings.eventDisplayNamePath)
+		}
+		if (settings.eventToIdPath) {
+			toId = jsonpath.value(event, settings.eventToIdPath)
+		}
+
+		// Mainly built to handle a Teams response.	
+		// Eventually the rules will have JSON paths to know how to handle messages for different sites.
+		let { resource } = event
+		if (resource.lastMessage) {
+			resource = resource.lastMessage
+		}
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		let messageText = jsonpath.value(event, settings.eventMessageTextPath!)
+		// console.debug("messageText:", messageText)
+		// Other types: messagetype: "Control/Typing", contenttype: "Application/Message"
+		if (resource.messagetype === 'Text' && resource.contenttype === 'text') {
+			// messageText = resource.content
+		} else if (resource.messagetype === 'RichText/Html' && resource.contenttype === 'text') {
+			// messageText = resource.content
+			if (messageText) {
+				// Get rid of HTML tags.
+				// There are fancier ways to do this but they can cause issues if they try to render themselves.
+				messageText = messageText.replace(/<[^>]+>/g, '')
+			}
+		} else {
+			messageText = undefined
+		}
+		if (messageText) {
+			console.debug(`onhello: Got "${messageText}" from "${from}".`)
+			let response: Response | undefined
+			if (window._onhelloGetResponse) {
+				response = window._onhelloGetResponse(from, messageText, settings.rules)
+			} else {
+				response = getResponse(from, messageText, settings.rules)
+			}
+			if (response) {
+				sendMethod(from, response, toId, requestHeaders, settings)
+			}
+			result.matches.push({
+				from,
+				messageText,
+				toId,
+				response,
+			})
+		}
+	})
 	return result
 }
 
@@ -111,8 +123,8 @@ export function isFromCurrentUser(from: string, url: string): boolean {
 
 function sendMessage(imdisplayname: string, response: Response, toId: string, requestHeaders: any, settings: Rules): Promise<any> {
 	console.debug(`onhello/sendMessage: Replying "${response.text}" to "${imdisplayname}".`)
-	// Shouldn't need the defaults here because the value should already get applied.
-	let url = settings.replyUrl || APP_DEFAULTS[settings.name].replyUrl
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	let url = settings.replyUrl!
 	url = url.replace(/{{toId}}/g, toId)
 
 	// This was built using by watching request in the Network tab on the browser's DevTools.

@@ -1,5 +1,5 @@
 import { browser } from 'webextension-polyfill-ts'
-import { APP_DEFAULTS, DEFAULT_RULES, RulesSettings } from './rules'
+import { DEFAULT_RULES, RulesSettings } from './rules'
 
 export async function getRules(): Promise<RulesSettings> {
 	const [{ localRules }, { syncedRules }] = await Promise.all([
@@ -26,16 +26,4 @@ export async function getRules(): Promise<RulesSettings> {
 	}
 
 	return result
-}
-
-export function applyDefaults(rules: RulesSettings): void {
-	for (const app of rules.apps) {
-		const defaults = APP_DEFAULTS[app.name]
-		if (!app.replyUrl) {
-			app.replyUrl = defaults.replyUrl
-		}
-		if (!app.urlPattern) {
-			app.urlPattern = defaults.urlPattern
-		}
-	}
 }

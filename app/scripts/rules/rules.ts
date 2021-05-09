@@ -9,6 +9,12 @@ export interface RulesSettings {
 
 export interface AppDefaults {
 	urlPattern: string
+	eventsPath: string
+	eventFromUrlPath?: string
+	eventComposeTimePath?: string
+	eventDisplayNamePath?: string
+	eventToIdPath?: string
+	eventMessageTextPath?: string
 	replyUrl: string
 }
 
@@ -19,8 +25,21 @@ export interface Rules {
 	 */
 	name: AppName
 	urlPattern?: string
+	/**
+	 * The JSON path for the events in the response body.
+	 */
+	eventsPath?: string
+	/**
+	 * Mainly for Teams.
+	 * Helps detect who a message came from.
+	 */
+	eventFromUrlPath?: string
+	eventComposeTimePath?: string
+	eventDisplayNamePath?: string
+	eventToIdPath?: string
+	eventMessageTextPath?: string
 	replyUrl?: string
-	
+
 	rules: Rule[]
 }
 
@@ -39,7 +58,13 @@ export interface Rule {
 export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 	teams: {
 		urlPattern: '^https://.*teams.(microsoft|live).com/.*/poll$',
-		replyUrl: "https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages",
+		eventsPath: '$.eventMessages[?(@.type==\'EventMessage\' && @.resourceType==\'NewMessage\')]',
+		eventFromUrlPath: '$.resource..from',
+		eventComposeTimePath: '$.resource..composetime',
+		eventDisplayNamePath: '$.resource..imdisplayname',
+		eventToIdPath: '$.resource..to',
+		eventMessageTextPath: '$.resource..content',
+		replyUrl: 'https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages',
 		// TODO Add JSON paths of where to get the message, sender name, etc.
 	}
 }
@@ -75,6 +100,26 @@ export const DEFAULT_RULES: RulesSettings = {
 			]
 		},
 	]
+}
+
+export function applyDefaults(rules: RulesSettings): void {
+	for (const app of rules.apps) {
+		const defaults = APP_DEFAULTS[app.name]
+		for (const [key, val] of Object.entries(defaults)) {
+			if ((app as any)[key] === undefined && val !== undefined) {
+				(app as any)[key] = val
+			}
+		}
+		// if (!app.replyUrl) {
+		// 	app.replyUrl = defaults.replyUrl
+		// }
+		// if (!app.eventsPath) {
+		// 	app.eventsPath = defaults.eventsPath
+		// }
+		// if (!app.urlPattern) {
+		// 	app.urlPattern = defaults.urlPattern
+		// }
+	}
 }
 
 export function checkRules(rules: RulesSettings): void {
