@@ -1,21 +1,15 @@
 export type AppName = 'teams'
 
+/**
+ * The object representing all of the user's rules.
+ */
 export interface RulesSettings {
+	/** When the rules were last modified. */
 	dateModified?: Date
+	/** The apps for which the user has rules. */
 	apps: Rules[]
 	// TODO Support global rules to run AFTER app specific rules.
 	// globalRules: Rule[]
-}
-
-export interface AppDefaults {
-	urlPattern: string
-	eventsPath: string
-	eventFromUrlPath?: string
-	eventComposeTimePath?: string
-	eventDisplayNamePath?: string
-	eventToIdPath?: string
-	eventMessageTextPath?: string
-	replyUrl: string
 }
 
 export interface Rules {
@@ -43,6 +37,9 @@ export interface Rules {
 	rules: Rule[]
 }
 
+/**
+ * A rule to respond to a message.
+ */
 export interface Rule {
 	messageExactMatch?: string
 	messagePattern?: string
@@ -55,6 +52,20 @@ export interface Rule {
 	responses: string[]
 }
 
+export interface AppDefaults {
+	urlPattern: string
+	eventsPath: string
+	eventFromUrlPath?: string
+	eventComposeTimePath?: string
+	eventDisplayNamePath?: string
+	eventToIdPath?: string
+	eventMessageTextPath?: string
+	replyUrl: string
+}
+
+/**
+ * Defaults to supply when the user doesn't set them.
+ */
 export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 	teams: {
 		urlPattern: '^https://.*teams.(microsoft|live).com/.*/poll$',
@@ -110,15 +121,6 @@ export function applyDefaults(rules: RulesSettings): void {
 				(app as any)[key] = val
 			}
 		}
-		// if (!app.replyUrl) {
-		// 	app.replyUrl = defaults.replyUrl
-		// }
-		// if (!app.eventsPath) {
-		// 	app.eventsPath = defaults.eventsPath
-		// }
-		// if (!app.urlPattern) {
-		// 	app.urlPattern = defaults.urlPattern
-		// }
 	}
 }
 

@@ -47,10 +47,13 @@ export class AppTheme extends React.Component<Props, {
 			})
 		}
 		browser.storage.onChanged.addListener((changes, areaName) => {
-			if (areaName === 'local' && changes.themePreference && changes.themePreference.newValue !== this.state.themePreference) {
-				this.setState({
-					themePreference: this.mapThemePreference(changes.themePreference.newValue),
-				})
+			if (areaName === 'local' && changes.themePreference) {
+				const themePreference = this.mapThemePreference(changes.themePreference.newValue)
+				if (themePreference !== this.state.themePreference) {
+					this.setState({
+						themePreference,
+					})
+				}
 			}
 		})
 	}
