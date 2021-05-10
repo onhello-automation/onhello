@@ -11,11 +11,11 @@ You can download the extension for various browsers:
 2. This code watches for web requests to URLs matching a certain pattern.
 You can customize this pattern if you find that the extension isn't working.
 3. When a matching URL is found, the response is parsed and the relevant fields such as the message sender and text are extracted.
-This extraction is not configurable yet but it soon will be so that this extension is more robust and can work for other messaging platforms.
-5. The code checks your custom rules to find the first one that matches the text.
-6. If a rule matches, your reply is randomly picked from one the possible responses.
-7. If your reply has placeholders (for example `{{ FROM_FIRST_NAME }}`), then they get filled in.
-8. A new web request is made to the `replyUrl`.
+This extraction is configurable so you can try changing the default extraction methods if you are having issues.
+4. The code checks your custom rules to find the first one that matches the text.
+5. If a rule matches, your reply is randomly picked from one the possible responses.
+6. If your reply has placeholders (for example `{{ FROM_FIRST_NAME }}`), then they get filled in.
+7. A new web request is made to the `replyUrl`.
 A default for Teams has been set up but you can change it if you find that the extension isn't working.
 
 
