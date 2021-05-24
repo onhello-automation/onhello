@@ -15,7 +15,7 @@ export class ErrorHandler {
 	constructor(private errorTextElement: HTMLElement | undefined | null = undefined) {
 	}
 
-	showError(input: Partial<ShowErrorInput> | any) {
+	showError(input: Partial<ShowErrorInput> | any): void {
 		const { serviceError, clearAfterMs } = input
 		let { errorMsg } = input
 		if (typeof errorMsg === 'string' && errorMsg) {
@@ -44,7 +44,7 @@ export class ErrorHandler {
 		}
 	}
 
-	clear() {
+	clear(): void {
 		if (this.errorTextElement) {
 			this.errorTextElement.innerText = ""
 		}

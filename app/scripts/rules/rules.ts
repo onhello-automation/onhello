@@ -4,36 +4,29 @@ export type AppName = 'teams'
  * The object representing all of the user's rules.
  */
 export interface RulesSettings {
+	/** The apps and rules for which the user has rules. */
+	apps: Rules[]
 	/** When the rules were last modified. */
 	dateModified?: Date
-	/** The apps for which the user has rules. */
-	apps: Rules[]
 	// TODO Support global rules to run AFTER app specific rules.
+	// They will run AFTER app specific rules so that they can easily be overriden for specific apps.
 	// globalRules: Rule[]
 }
 
-export interface Rules {
+/**
+ * The rules for an app.
+ * Many fields have defaults that can be retrieved based on the app name.
+ */
+export interface Rules extends Partial<AppDefaults> {
 	/**
 	 * An identifier for the application.
-	 * Only Microsoft Teams is supported for now.
+	 * This name will be used to retrieve default values for other fields without provided values.
+	 * Only Microsoft Teams ('teams') is fully supported for now.
 	 */
 	name: AppName
-	urlPattern?: string
 	/**
-	 * The JSON path for the events in the response body.
+	 * The rules to check when a message comes in that matches the URL pattern and other filters.
 	 */
-	eventsPath?: string
-	/**
-	 * Mainly for Teams.
-	 * Helps detect who a message came from.
-	 */
-	eventFromUrlPath?: string
-	eventComposeTimePath?: string
-	eventDisplayNamePath?: string
-	eventToIdPath?: string
-	eventMessageTextPath?: string
-	replyUrl?: string
-
 	rules: Rule[]
 }
 
@@ -41,25 +34,70 @@ export interface Rules {
  * A rule to respond to a message.
  */
 export interface Rule {
+	/**
+	 * This rule triggers if the message text is exactly the same as the value for this field.
+	 */
 	messageExactMatch?: string
+	/**
+	 * This rule triggers if the message text matches this regex pattern.
+	 * A JavaScript regex is created and `Regex.test` is used to check for a match.
+	 */
 	messagePattern?: string
+	/**
+	 * The flags for {@link messagePattern}.
+	 */
 	regexFlags?: string
 
 	// TODO Add time range of when to respond.
 	// TODO Add message age limit.
 
-	/** A random item from this list will be selected. */
+	/**
+	 * If this rule matches the message, then
+	 * a random item from this list will be selected as the response.
+	 * Placeholders such as `{{ FROM }}` and `{{ FROM_FIRST_NAME }}` can be given as explained in the Options page.
+	 */
 	responses: string[]
 }
 
+/**
+ * An object for defaults to supply for values in {@link Rules} when values are missing.
+ */
 export interface AppDefaults {
+	/**
+	 * A regex pattern to match the URL of polling request to get more messages.
+	 */
 	urlPattern: string
+	/**
+	 * The JSON path for the events in the response body of the polling request.
+	 */
 	eventsPath: string
-	eventFromUrlPath?: string
-	eventComposeTimePath?: string
-	eventDisplayNamePath?: string
-	eventToIdPath?: string
-	eventMessageTextPath?: string
+	/**
+	 * Mainly for Microsot Teams.
+	 * The path in the response event to a URL value that helps detect who a message came from.
+	 */
+	eventFromUrlPath: string
+	/**
+	 * The path in the response event to when the message was composed.
+	 */
+	eventComposeTimePath: string
+	/**
+	 * The path in the response event to the display name of the message sender.
+	 */
+	eventDisplayNamePath: string
+	/**
+	 * The path in the response event to the ID of who the message is being sent to.
+	 */
+	eventToIdPath: string
+	/**
+	 * The path in the response event to the message's text.
+	 */
+	eventMessageTextPath: string
+	/**
+	 * The URL to use to reply to a message.
+	 * This can have placeholders.
+	 * Supported placeholder:
+	 * * `{{toId}}`: retrieved using {@link eventToIdPath}.
+	 */
 	replyUrl: string
 }
 
@@ -76,7 +114,6 @@ export const APP_DEFAULTS: { [app: string]: AppDefaults } = {
 		eventToIdPath: '$.resource..to',
 		eventMessageTextPath: '$.resource..content',
 		replyUrl: 'https://teams.microsoft.com/api/chatsvc/amer/v1/users/ME/conversations/{{toId}}/messages',
-		// TODO Add JSON paths of where to get the message, sender name, etc.
 	}
 }
 
@@ -117,7 +154,7 @@ export function applyDefaults(rules: RulesSettings): void {
 	for (const app of rules.apps) {
 		const defaults = APP_DEFAULTS[app.name]
 		for (const [key, val] of Object.entries(defaults)) {
-			if ((app as any)[key] === undefined && val !== undefined) {
+			if (val !== undefined && (app as any)[key] === undefined) {
 				(app as any)[key] = val
 			}
 		}

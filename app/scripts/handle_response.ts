@@ -20,6 +20,7 @@ export interface HandleResponseResult {
 	matches: HandleResponseMatch[]
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function handleResponse(url: string, responseBody: any, requestHeaders: any, settings: Rules, sendMethod = sendMessage): Promise<HandleResponseResult | undefined> {
 	if (window._onhelloHandleResponse) {
 		window._onhelloHandleResponse(url, responseBody, requestHeaders, settings)
