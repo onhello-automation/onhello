@@ -14,6 +14,31 @@ const open = XHR.open
 const send = XHR.send
 const setRequestHeader = XHR.setRequestHeader
 
+// TODO Handle request sent in Service Worker
+addEventListener('fetch', async event => {
+	const rules = window._onhelloRules
+	if (rules === undefined) {
+		console.debug("onhello: fetch listener: No rules set.")
+		return
+	}
+	const { url, headers: requestHeaders, preloadResponse } = event.request
+	const responseBody = await preloadResponse
+	console.log("onhello: fetch:", event, responseBody)
+	try {
+		for (const settings of rules.apps) {
+			console.debug("onhello: URL:", url)
+			if (settings === undefined || settings.urlPattern === undefined || !(new RegExp(settings.urlPattern, 'i').test(url))) {
+				console.debug("onhello: URL did not match the pattern.")
+				continue
+			}
+			console.debug("onhello: URL matched pattern. URL:", url)
+			handleResponse(url, responseBody, requestHeaders, settings)
+		}
+	} catch (err) {
+		console.debug("onhello: Error reading response or processing rules.", err)
+	}
+})
+
 XHR.open = function () {
 	this._requestHeaders = {}
 
@@ -33,13 +58,14 @@ XHR.send = function () {
 		this.addEventListener('load', function () {
 			// const responseHeaders = this.getAllResponseHeaders()
 			try {
+				const url = this.responseURL
 				for (const settings of rules.apps) {
-					const url = this.responseURL
+					console.debug("onhello: URL:", url)
 					if (settings === undefined || settings.urlPattern === undefined || !(new RegExp(settings.urlPattern, 'i').test(url))) {
-						// console.debug("onhello: URL did not match the pattern.")
-						return
+						console.debug("onhello: URL did not match the pattern.")
+						continue
 					}
-					// console.debug("onhello: URL:", url)
+					console.debug("onhello: URL matched pattern. URL:", url)
 
 					if (this.responseType != 'blob') {
 						let responseBody
